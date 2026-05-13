@@ -152,13 +152,17 @@ fun MessageItem(
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
+            val isSelf = message.senderPeerID == meshService.myPeerID || 
+                         message.sender == currentUserNickname ||
+                         message.sender.startsWith("$currentUserNickname#")
+                         
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = if (isSelf) Arrangement.End else Arrangement.Start,
                 verticalAlignment = Alignment.Top
             ) {
                 // Provide a small end padding for own private messages so overlay doesn't cover text
-                val endPad = if (message.isPrivate && message.sender == currentUserNickname) 16.dp else 0.dp
+                val endPad = if (message.isPrivate && isSelf) 16.dp else 0.dp
                 // Create a custom layout that combines selectable text with clickable nickname areas
                 MessageTextWithClickableNicknames(
                     message = message,
@@ -172,8 +176,11 @@ fun MessageItem(
                     onCancelTransfer = onCancelTransfer,
                     onImageClick = onImageClick,
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(end = endPad)
+                        .then(if (isSelf) Modifier.wrapContentWidth() else Modifier.weight(1f, fill = false))
+                        .padding(
+                            start = if (isSelf) 40.dp else 0.dp,
+                            end = if (isSelf) endPad else 40.dp
+                        )
                 )
             }
 
@@ -247,6 +254,10 @@ fun MessageItem(
     // File special rendering
     if (message.type == BlueTalkMessageType.File) {
         val path = message.content.trim()
+        val isSelf = message.senderPeerID == meshService.myPeerID || 
+                     message.sender == currentUserNickname ||
+                     message.sender.startsWith("$currentUserNickname#")
+                     
         // Derive sending progress if applicable
         val (overrideProgress, _) = when (val st = message.deliveryStatus) {
             is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered -> {
@@ -256,7 +267,7 @@ fun MessageItem(
             }
             else -> null to null
         }
-        Column(modifier = modifier.fillMaxWidth()) {
+        Column(modifier = modifier) {
             // Header: nickname + timestamp line above the file, identical styling to text messages
             val headerText = formatMessageHeaderAnnotatedString(
                 message = message,
@@ -271,7 +282,9 @@ fun MessageItem(
                 text = headerText,
                 fontFamily = FontFamily.Monospace,
                 color = colorScheme.onSurface,
-                modifier = Modifier.pointerInput(message.id) {
+                modifier = Modifier
+                    .align(if (isSelf) Alignment.End else Alignment.Start)
+                    .pointerInput(message.id) {
                     detectTapGestures(onTap = { pos ->
                         val layout = headerLayout ?: return@detectTapGestures
                         val offset = layout.getOffsetForPosition(pos)
@@ -302,7 +315,10 @@ fun MessageItem(
                 null
             }
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+            Row(
+                modifier = Modifier.align(if (isSelf) Alignment.End else Alignment.Start),
+                horizontalArrangement = if (isSelf) Arrangement.End else Arrangement.Start
+            ) {
                 Box {
                     if (packet != null) {
                         if (overrideProgress != null) {
@@ -323,7 +339,7 @@ fun MessageItem(
                         }
 
                         // Cancel button overlay during sending
-                        val showCancel = message.sender == currentUserNickname && (message.deliveryStatus is DeliveryStatus.PartiallyDelivered)
+                        val showCancel = isSelf && (message.deliveryStatus is DeliveryStatus.PartiallyDelivered)
                         if (showCancel) {
                             Box(
                                 modifier = Modifier

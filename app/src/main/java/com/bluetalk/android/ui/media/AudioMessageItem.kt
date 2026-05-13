@@ -48,7 +48,11 @@ fun AudioMessageItem(
         }
         else -> null to null
     }
-    Column(modifier = modifier.fillMaxWidth()) {
+    val isSelf = message.senderPeerID == meshService.myPeerID || 
+                 message.sender == currentUserNickname ||
+                 message.sender.startsWith("$currentUserNickname#")
+
+    Column(modifier = modifier) {
         // Header: nickname + timestamp line above the audio note, identical styling to text messages
         val headerText = com.bluetalk.android.ui.formatMessageHeaderAnnotatedString(
             message = message,
@@ -63,7 +67,9 @@ fun AudioMessageItem(
             text = headerText,
             fontFamily = FontFamily.Monospace,
             color = colorScheme.onSurface,
-            modifier = Modifier.pointerInput(message.id) {
+            modifier = Modifier
+                .align(if (isSelf) Alignment.End else Alignment.Start)
+                .pointerInput(message.id) {
                 detectTapGestures(onTap = { pos ->
                     val layout = headerLayout ?: return@detectTapGestures
                     val offset = layout.getOffsetForPosition(pos)
@@ -77,13 +83,16 @@ fun AudioMessageItem(
             onTextLayout = { headerLayout = it }
         )
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.align(if (isSelf) Alignment.End else Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             VoiceNotePlayer(
                 path = path,
                 progressOverride = overrideProgress,
                 progressColor = overrideColor
             )
-            val showCancel = message.sender == currentUserNickname && (message.deliveryStatus is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered)
+            val showCancel = isSelf && (message.deliveryStatus is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered)
             if (showCancel) {
                 Spacer(Modifier.width(8.dp))
                 Box(

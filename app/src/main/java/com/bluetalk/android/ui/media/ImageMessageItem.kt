@@ -49,7 +49,11 @@ fun ImageMessageItem(
     modifier: Modifier = Modifier
 ) {
     val path = message.content.trim()
-    Column(modifier = modifier.fillMaxWidth()) {
+    val isSelf = message.senderPeerID == meshService.myPeerID || 
+                 message.sender == currentUserNickname ||
+                 message.sender.startsWith("$currentUserNickname#")
+
+    Column(modifier = modifier) {
         val headerText = com.bluetalk.android.ui.formatMessageHeaderAnnotatedString(
             message = message,
             currentUserNickname = currentUserNickname,
@@ -63,7 +67,9 @@ fun ImageMessageItem(
             text = headerText,
             fontFamily = FontFamily.Monospace,
             color = colorScheme.onSurface,
-            modifier = Modifier.pointerInput(message.id) {
+            modifier = Modifier
+                .align(if (isSelf) Alignment.End else Alignment.Start)
+                .pointerInput(message.id) {
                 detectTapGestures(onTap = { pos ->
                     val layout = headerLayout ?: return@detectTapGestures
                     val offset = layout.getOffsetForPosition(pos)
@@ -93,9 +99,12 @@ fun ImageMessageItem(
                 is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered -> if (st.total > 0) st.reached.toFloat() / st.total.toFloat() else 0f
                 else -> null
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+            Row(
+                modifier = Modifier.align(if (isSelf) Alignment.End else Alignment.Start),
+                horizontalArrangement = if (isSelf) Arrangement.End else Arrangement.Start
+            ) {
                 Box {
-                    if (progressFraction != null && progressFraction < 1f && message.sender == currentUserNickname) {
+                    if (progressFraction != null && progressFraction < 1f && isSelf) {
                         // Cyberpunk block-reveal while sending
                         BlockRevealImage(
                             bitmap = img,
@@ -128,7 +137,7 @@ fun ImageMessageItem(
                         )
                     }
                     // Cancel button overlay during sending
-                    val showCancel = message.sender == currentUserNickname && (message.deliveryStatus is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered)
+                    val showCancel = isSelf && (message.deliveryStatus is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered)
                     if (showCancel) {
                         Box(
                             modifier = Modifier
@@ -145,7 +154,12 @@ fun ImageMessageItem(
                 }
             }
         } else {
-            Text(text = stringResource(com.bluetalk.android.R.string.image_unavailable), fontFamily = FontFamily.Monospace, color = Color.Gray)
+            Text(
+                text = stringResource(com.bluetalk.android.R.string.image_unavailable),
+                fontFamily = FontFamily.Monospace,
+                color = Color.Gray,
+                modifier = Modifier.align(if (isSelf) Alignment.End else Alignment.Start)
+            )
         }
     }
 }
