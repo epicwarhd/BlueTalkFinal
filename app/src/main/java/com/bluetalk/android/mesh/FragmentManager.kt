@@ -1,7 +1,7 @@
 package com.bluetalk.android.mesh
 
 import android.util.Log
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.protocol.MessageType
 import com.bluetalk.android.protocol.MessagePadding
 import com.bluetalk.android.model.FragmentPayload
@@ -51,7 +51,7 @@ class FragmentManager {
      * Create fragments from a large packet - 100% iOS Compatible
      * Matches iOS sendFragmentedPacket() implementation exactly
      */
-    fun createFragments(packet: BitchatPacket): List<BitchatPacket> {
+    fun createFragments(packet: BlueTalkPacket): List<BlueTalkPacket> {
         try {
             Log.d(TAG, "🔀 Creating fragments for packet type ${packet.type}, payload: ${packet.payload.size} bytes")
         val encoded = packet.toBinaryData()
@@ -75,7 +75,7 @@ class FragmentManager {
             return listOf(packet) // No fragmentation needed
         }
         
-        val fragments = mutableListOf<BitchatPacket>()
+        val fragments = mutableListOf<BlueTalkPacket>()
         
         // iOS: let fragmentID = Data((0..<8).map { _ in UInt8.random(in: 0...255) })
         val fragmentID = FragmentPayload.generateFragmentID()
@@ -126,7 +126,7 @@ class FragmentManager {
             
             // iOS: MessageType.fragment.rawValue (single fragment type)
             // Fix: Fragments must inherit source route and use v2 if routed
-            val fragmentPacket = BitchatPacket(
+            val fragmentPacket = BlueTalkPacket(
                 version = if (packet.route != null) 2u else 1u,
                 type = MessageType.FRAGMENT.value,
                 ttl = packet.ttl,
@@ -154,7 +154,7 @@ class FragmentManager {
      * Handle incoming fragment - 100% iOS Compatible  
      * Matches iOS handleFragment() implementation exactly
      */
-    fun handleFragment(packet: BitchatPacket): BitchatPacket? {
+    fun handleFragment(packet: BlueTalkPacket): BlueTalkPacket? {
         // iOS: guard packet.payload.count > 13 else { return }
         if (packet.payload.size < FragmentPayload.HEADER_SIZE) {
             Log.w(TAG, "Fragment packet too small: ${packet.payload.size}")
@@ -265,7 +265,7 @@ class FragmentManager {
                         }
                     }
 
-                    val originalPacket = BitchatPacket.fromBinaryData(reassembledData.toByteArray())
+                    val originalPacket = BlueTalkPacket.fromBinaryData(reassembledData.toByteArray())
                     if (originalPacket != null) {
                         removeFragmentSetLocked(fragmentIDString)
 
@@ -394,5 +394,5 @@ class FragmentManager {
  * Delegate interface for fragment manager callbacks
  */
 interface FragmentManagerDelegate {
-    fun onPacketReassembled(packet: BitchatPacket)
+    fun onPacketReassembled(packet: BlueTalkPacket)
 }

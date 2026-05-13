@@ -1,7 +1,7 @@
 package com.bluetalk.android.ui
 
-import com.bluetalk.android.model.BitchatMessage
-import com.bluetalk.android.model.BitchatMessageType
+import com.bluetalk.android.model.BlueTalkMessage
+import com.bluetalk.android.model.BlueTalkMessageType
 
 /**
  * Utilities for building human-friendly notification text/previews.
@@ -15,12 +15,12 @@ object NotificationTextUtils {
      * - File (pdf): "📄 file.pdf"
      * - Text: original message content
      */
-    fun buildPrivateMessagePreview(message: BitchatMessage): String {
+    fun buildPrivateMessagePreview(message: BlueTalkMessage): String {
         return try {
             when (message.type) {
-                BitchatMessageType.Image -> "📷 sent an image"
-                BitchatMessageType.Audio -> "🎤 sent a voice message"
-                BitchatMessageType.File -> {
+                BlueTalkMessageType.Image -> "📷 sent an image"
+                BlueTalkMessageType.Audio -> "🎤 sent a voice message"
+                BlueTalkMessageType.File -> {
                     // Show just the filename (not the full path)
                     val name = try { java.io.File(message.content).name } catch (_: Exception) { null }
                     if (!name.isNullOrBlank()) {

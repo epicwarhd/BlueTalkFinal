@@ -17,7 +17,7 @@ import com.bluetalk.android.core.ui.component.button.CloseButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BitchatSheetTopBar(
+fun BlueTalkSheetTopBar(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundAlpha: Float = 0.98f,
@@ -46,7 +46,7 @@ fun BitchatSheetTopBar(
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BitchatSheetCenterTopBar(
+fun BlueTalkSheetCenterTopBar(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundAlpha: Float = 0.98f,
@@ -75,7 +75,7 @@ fun BitchatSheetCenterTopBar(
 }
 
 @Composable
-fun BitchatSheetTitle(text: String) {
+fun BlueTalkSheetTitle(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium.copy(

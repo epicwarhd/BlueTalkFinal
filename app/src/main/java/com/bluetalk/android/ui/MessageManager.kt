@@ -1,6 +1,6 @@
 package com.bluetalk.android.ui
 
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import com.bluetalk.android.model.DeliveryStatus
 import java.util.*
 import java.util.Collections
@@ -18,7 +18,7 @@ class MessageManager(private val state: ChatState) {
     
     // MARK: - Public Message Management
     
-    fun addMessage(message: BitchatMessage) {
+    fun addMessage(message: BlueTalkMessage) {
         val currentMessages = state.getMessagesValue().toMutableList()
         currentMessages.add(message)
         state.setMessages(currentMessages)
@@ -28,7 +28,7 @@ class MessageManager(private val state: ChatState) {
 
     // Log a system message into the main chat (visible to user)
     fun addSystemMessage(text: String) {
-        val sys = BitchatMessage(
+        val sys = BlueTalkMessage(
             sender = "system",
             content = text,
             timestamp = Date(),
@@ -44,7 +44,7 @@ class MessageManager(private val state: ChatState) {
     
     // MARK: - Channel Message Management
     
-    fun addChannelMessage(channel: String, message: BitchatMessage) {
+    fun addChannelMessage(channel: String, message: BlueTalkMessage) {
         val currentChannelMessages = state.getChannelMessagesValue().toMutableMap()
         if (!currentChannelMessages.containsKey(channel)) {
             currentChannelMessages[channel] = mutableListOf()
@@ -99,7 +99,7 @@ class MessageManager(private val state: ChatState) {
     
     // MARK: - Private Message Management
 
-    fun addPrivateMessage(peerID: String, message: BitchatMessage) {
+    fun addPrivateMessage(peerID: String, message: BlueTalkMessage) {
         val currentPrivateChats = state.getPrivateChatsValue().toMutableMap()
         if (!currentPrivateChats.containsKey(peerID)) {
             currentPrivateChats[peerID] = mutableListOf()
@@ -121,7 +121,7 @@ class MessageManager(private val state: ChatState) {
     }
 
     // Variant that does not mark unread (used when we know the message has been read already, e.g., persisted Nostr read store)
-    fun addPrivateMessageNoUnread(peerID: String, message: BitchatMessage) {
+    fun addPrivateMessageNoUnread(peerID: String, message: BlueTalkMessage) {
         val currentPrivateChats = state.getPrivateChatsValue().toMutableMap()
         if (!currentPrivateChats.containsKey(peerID)) {
             currentPrivateChats[peerID] = mutableListOf()
@@ -159,7 +159,7 @@ class MessageManager(private val state: ChatState) {
     /**
      * Generate a unique key for message deduplication
      */
-    fun generateMessageKey(message: BitchatMessage): String {
+    fun generateMessageKey(message: BlueTalkMessage): String {
         val senderKey = message.senderPeerID ?: message.sender
         val contentHash = message.content.hashCode()
         return "$senderKey-${message.timestamp.time}-$contentHash"

@@ -586,7 +586,7 @@ class BinaryProtocolTest {
      * A fuzz-like robustness test. In a mesh network, any device can send
      * any bytes. The decoder must never crash, leak memory, or enter an
      * infinite loop on arbitrary input — it should simply return null for
-     * anything it can't parse as a valid BitchatPacket.
+     * anything it can't parse as a valid BlueTalkPacket.
      */
     @Test
     fun `garbage data returns null without crashing`() {
@@ -621,7 +621,7 @@ class BinaryProtocolTest {
     fun `sender ID is padded or truncated to exactly 8 bytes`() {
         // Short sender (4 bytes) — should be zero-padded to 8
         val shortSender = byteArrayOf(0x11, 0x22, 0x33, 0x44)
-        val shortPacket = BitchatPacket(
+        val shortPacket = BlueTalkPacket(
             version = 1u,
             type = MessageType.ANNOUNCE.value,
             senderID = shortSender,
@@ -641,7 +641,7 @@ class BinaryProtocolTest {
 
         // Long sender (12 bytes) — should be truncated to 8
         val longSender = ByteArray(12) { (it + 0x50).toByte() }
-        val longPacket = BitchatPacket(
+        val longPacket = BlueTalkPacket(
             version = 1u,
             type = MessageType.ANNOUNCE.value,
             senderID = longSender,
@@ -1121,7 +1121,7 @@ class BinaryProtocolTest {
         signature: ByteArray? = null,
         ttl: UByte = 5u,
         route: List<ByteArray>? = null
-    ) = BitchatPacket(
+    ) = BlueTalkPacket(
         version = version,
         type = type,
         senderID = hexToBytes(senderHex),
@@ -1133,7 +1133,7 @@ class BinaryProtocolTest {
         route = route
     )
 
-    private fun roundTrip(packet: BitchatPacket): BitchatPacket {
+    private fun roundTrip(packet: BlueTalkPacket): BlueTalkPacket {
         val encoded = BinaryProtocol.encode(packet)
         assertNotNull("Encoding must not return null", encoded)
         val decoded = BinaryProtocol.decode(encoded!!)
@@ -1141,7 +1141,7 @@ class BinaryProtocolTest {
         return decoded!!
     }
 
-    private fun assertPacketEquals(expected: BitchatPacket, actual: BitchatPacket) {
+    private fun assertPacketEquals(expected: BlueTalkPacket, actual: BlueTalkPacket) {
         assertEquals("version", expected.version, actual.version)
         assertEquals("type", expected.type, actual.type)
         assertEquals("ttl", expected.ttl, actual.ttl)

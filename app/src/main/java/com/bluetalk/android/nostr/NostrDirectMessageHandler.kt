@@ -2,13 +2,13 @@ package com.bluetalk.android.nostr
 
 import android.app.Application
 import android.util.Log
-import com.bluetalk.android.model.BitchatFilePacket
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkFilePacket
+import com.bluetalk.android.model.BlueTalkMessage
 import com.bluetalk.android.model.DeliveryStatus
 import com.bluetalk.android.model.NoisePayload
 import com.bluetalk.android.model.NoisePayloadType
 import com.bluetalk.android.model.PrivateMessagePacket
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.services.SeenMessageStore
 import com.bluetalk.android.ui.ChatState
 import com.bluetalk.android.ui.MeshDelegateHandler
@@ -67,11 +67,11 @@ class NostrDirectMessageHandler(
                 // If sender is blocked for geohash contexts, drop any events from this pubkey
                 // Applies to both geohash DMs (geohash != "") and account DMs (geohash == "")
                 if (dataManager.isGeohashUserBlocked(senderPubkey)) return@launch
-                if (!content.startsWith("bitchat1:")) return@launch
+                if (!content.startsWith("bluetalk1:")) return@launch
 
-                val base64Content = content.removePrefix("bitchat1:")
+                val base64Content = content.removePrefix("bluetalk1:")
                 val packetData = base64URLDecode(base64Content) ?: return@launch
-                val packet = BitchatPacket.fromBinaryData(packetData) ?: return@launch
+                val packet = BlueTalkPacket.fromBinaryData(packetData) ?: return@launch
 
                 if (packet.type != com.bluetalk.android.protocol.MessageType.NOISE_ENCRYPTED.value) return@launch
 
@@ -121,7 +121,7 @@ class NostrDirectMessageHandler(
                 val existingMessages = state.getPrivateChatsValue()[convKey] ?: emptyList()
                 if (existingMessages.any { it.id == pm.messageID }) return
 
-                val message = BitchatMessage(
+                val message = BlueTalkMessage(
                     id = pm.messageID,
                     sender = senderNickname,
                     content = pm.content,
@@ -166,11 +166,11 @@ class NostrDirectMessageHandler(
             }
             NoisePayloadType.FILE_TRANSFER -> {
                 // Properly handle encrypted file transfer
-                val file = BitchatFilePacket.decode(payload.data)
+                val file = BlueTalkFilePacket.decode(payload.data)
                 if (file != null) {
                     val uniqueMsgId = java.util.UUID.randomUUID().toString().uppercase()
                     val savedPath = com.bluetalk.android.features.file.FileUtils.saveIncomingFile(application, file)
-                    val message = BitchatMessage(
+                    val message = BlueTalkMessage(
                         id = uniqueMsgId,
                         sender = senderNickname,
                         content = savedPath,

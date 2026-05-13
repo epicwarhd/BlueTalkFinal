@@ -2,7 +2,7 @@
 package com.bluetalk.android.mesh
 
 import com.bluetalk.android.model.RoutedPacket
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.protocol.MessageType
 import com.bluetalk.android.util.toHexString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,8 +34,8 @@ class PacketRelayManagerTest {
         whenever(delegate.getBroadcastRecipient()).thenReturn(byteArrayOf(0,0,0,0,0,0,0,0))
     }
 
-    private fun createPacket(route: List<ByteArray>?, recipient: String? = null): BitchatPacket {
-        return BitchatPacket(
+    private fun createPacket(route: List<ByteArray>?, recipient: String? = null): BlueTalkPacket {
+        return BlueTalkPacket(
             type = MessageType.MESSAGE.value,
             senderID = hexStringToPeerBytes(otherPeerID),
             recipientID = recipient?.let { hexStringToPeerBytes(it) },

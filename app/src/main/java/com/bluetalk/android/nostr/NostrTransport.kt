@@ -85,7 +85,7 @@ class NostrTransport(
                     return@launch
                 }
                 
-                // Strict: lookup the recipient's current BitChat peer ID using favorites mapping
+                // Strict: lookup the recipient's current BlueTalk peer ID using favorites mapping
                 val recipientPeerIDForEmbed = try {
                     com.bluetalk.android.favorites.FavoritesPersistenceService.shared
                         .findPeerIDForNostrPubkey(recipientNostrPubkey)
@@ -94,7 +94,7 @@ class NostrTransport(
                     Log.e(TAG, "NostrTransport: no peerID stored for recipient npub; cannot embed PM. npub=${recipientNostrPubkey.take(16)}...")
                     return@launch
                 }
-                val embedded = NostrEmbeddedBitChat.encodePMForNostr(
+                val embedded = NostrEmbeddedBlueTalk.encodePMForNostr(
                     content = content,
                     messageID = messageID,
                     recipientPeerID = recipientPeerIDForEmbed,
@@ -180,7 +180,7 @@ class NostrTransport(
                     return@launch
                 }
                 
-                val ack = NostrEmbeddedBitChat.encodeAckForNostr(
+                val ack = NostrEmbeddedBlueTalk.encodeAckForNostr(
                     type = NoisePayloadType.READ_RECEIPT,
                     messageID = item.receipt.originalMessageID,
                     recipientPeerID = item.peerID,
@@ -253,7 +253,7 @@ class NostrTransport(
                     return@launch
                 }
                 
-                val embedded = NostrEmbeddedBitChat.encodePMForNostr(
+                val embedded = NostrEmbeddedBlueTalk.encodePMForNostr(
                     content = content,
                     messageID = UUID.randomUUID().toString(),
                     recipientPeerID = to,
@@ -311,7 +311,7 @@ class NostrTransport(
                     return@launch
                 }
                 
-                val ack = NostrEmbeddedBitChat.encodeAckForNostr(
+                val ack = NostrEmbeddedBlueTalk.encodeAckForNostr(
                     type = NoisePayloadType.DELIVERED,
                     messageID = messageID,
                     recipientPeerID = to,
@@ -351,7 +351,7 @@ class NostrTransport(
             try {
                 Log.d(TAG, "GeoDM: send DELIVERED -> recip=${toRecipientHex.take(8)}... mid=${messageID.take(8)}... from=${fromIdentity.publicKeyHex.take(8)}...")
                 
-                val embedded = NostrEmbeddedBitChat.encodeAckForNostrNoRecipient(
+                val embedded = NostrEmbeddedBlueTalk.encodeAckForNostrNoRecipient(
                     type = NoisePayloadType.DELIVERED,
                     messageID = messageID,
                     senderPeerID = senderPeerID
@@ -386,7 +386,7 @@ class NostrTransport(
             try {
                 Log.d(TAG, "GeoDM: send READ -> recip=${toRecipientHex.take(8)}... mid=${messageID.take(8)}... from=${fromIdentity.publicKeyHex.take(8)}...")
                 
-                val embedded = NostrEmbeddedBitChat.encodeAckForNostrNoRecipient(
+                val embedded = NostrEmbeddedBlueTalk.encodeAckForNostrNoRecipient(
                     type = NoisePayloadType.READ_RECEIPT,
                     messageID = messageID,
                     senderPeerID = senderPeerID
@@ -448,8 +448,8 @@ class NostrTransport(
                     "GeoDM: send PM -> recip=${toRecipientHex.take(8)}... mid=${messageID.take(8)}... from=${fromIdentity.publicKeyHex.take(8)}... geohash=$geohash"
                 )
 
-                // Build embedded BitChat packet without recipient peer ID
-                val embedded = NostrEmbeddedBitChat.encodePMForNostrNoRecipient(
+                // Build embedded BlueTalk packet without recipient peer ID
+                val embedded = NostrEmbeddedBlueTalk.encodePMForNostrNoRecipient(
                     content = content,
                     messageID = messageID,
                     senderPeerID = senderPeerID

@@ -4,7 +4,7 @@ import android.bluetooth.*
 import android.content.Context
 import android.util.Log
 import com.bluetalk.android.model.RoutedPacket
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -42,7 +42,7 @@ class BluetoothConnectionManager(
     
     // Delegate for component managers to call back to main manager
     private val componentDelegate = object : BluetoothConnectionManagerDelegate {
-        override fun onPacketReceived(packet: BitchatPacket, peerID: String, device: BluetoothDevice?) {
+        override fun onPacketReceived(packet: BlueTalkPacket, peerID: String, device: BluetoothDevice?) {
             Log.d(TAG, "onPacketReceived: Packet received from ${device?.address} ($peerID)")
             device?.let { bluetoothDevice ->
                 // Get current RSSI for this device and update if available
@@ -305,7 +305,7 @@ class BluetoothConnectionManager(
     /**
      * Send a packet directly to a specific peer, without broadcasting to others.
      */
-    fun sendPacketToPeer(peerID: String, packet: BitchatPacket): Boolean {
+    fun sendPacketToPeer(peerID: String, packet: BlueTalkPacket): Boolean {
         if (!isActive) return false
         return packetBroadcaster.sendPacketToPeer(
             RoutedPacket(packet),
@@ -437,7 +437,7 @@ class BluetoothConnectionManager(
  * Delegate interface for Bluetooth connection manager callbacks
  */
 interface BluetoothConnectionManagerDelegate {
-    fun onPacketReceived(packet: BitchatPacket, peerID: String, device: BluetoothDevice?)
+    fun onPacketReceived(packet: BlueTalkPacket, peerID: String, device: BluetoothDevice?)
     fun onDeviceConnected(device: BluetoothDevice)
     fun onDeviceDisconnected(device: BluetoothDevice)
     fun onRSSIUpdated(deviceAddress: String, rssi: Int)

@@ -3,7 +3,7 @@ package com.bluetalk.android.ui
 import com.bluetalk.android.mesh.BluetoothMeshDelegate
 import com.bluetalk.android.ui.NotificationTextUtils
 import com.bluetalk.android.mesh.BluetoothMeshService
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import com.bluetalk.android.model.DeliveryStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ class MeshDelegateHandler(
     private val getMeshService: () -> BluetoothMeshService
 ) : BluetoothMeshDelegate {
 
-    override fun didReceiveMessage(message: BitchatMessage) {
+    override fun didReceiveMessage(message: BlueTalkMessage) {
         coroutineScope.launch {
             // FIXED: Deduplicate messages from dual connection paths
             val messageKey = messageManager.generateMessageKey(message)
@@ -238,7 +238,7 @@ class MeshDelegateHandler(
     /**
      * Check for mentions in mesh messages and trigger notifications
      */
-    private fun checkAndTriggerMeshMentionNotification(message: BitchatMessage) {
+    private fun checkAndTriggerMeshMentionNotification(message: BlueTalkMessage) {
         try {
             // Get user's current nickname
             val currentNickname = state.getNicknameValue()
@@ -282,7 +282,7 @@ class MeshDelegateHandler(
      * Uses same logic as notification system - send read receipt if user is currently
      * viewing the private chat with this sender AND app is in foreground.
      */
-    private fun sendReadReceiptIfFocused(message: BitchatMessage) {
+    private fun sendReadReceiptIfFocused(message: BlueTalkMessage) {
         // Get notification manager's focus state (mirror the notification logic)
         val isAppInBackground = notificationManager.getAppBackgroundState()
         val currentPrivateChatPeer = notificationManager.getCurrentPrivateChatPeer()

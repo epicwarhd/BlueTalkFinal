@@ -26,10 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bluetalk.android.core.ui.component.button.CloseButton
-import com.bluetalk.android.core.ui.component.sheet.BitchatBottomSheet
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetCenterTopBar
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTitle
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTopBar
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkBottomSheet
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetCenterTopBar
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTitle
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTopBar
 import com.bluetalk.android.geohash.ChannelID
 import com.bluetalk.android.ui.theme.BASE_FONT_SIZE
 import com.bluetalk.android.nostr.GeohashAliasRegistry
@@ -80,7 +80,7 @@ fun MeshPeerListSheet(
     )
 
     if (isPresented) {
-        BitchatBottomSheet(
+        BlueTalkBottomSheet(
             modifier = modifier,
             onDismissRequest = onDismiss,
             sheetState = sheetState,
@@ -175,9 +175,9 @@ fun MeshPeerListSheet(
                 }
 
                 // TopBar (animated)
-                BitchatSheetTopBar(
+                BlueTalkSheetTopBar(
                     title = {
-                        BitchatSheetTitle(text = stringResource(id = R.string.your_network))
+                        BlueTalkSheetTitle(text = stringResource(id = R.string.your_network))
                     },
                     backgroundAlpha = topBarAlpha,
                     actions = {
@@ -812,7 +812,7 @@ fun PrivateChatSheet(
     )
 
     if (isPresented) {
-        BitchatBottomSheet(
+        BlueTalkBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
         ) {
@@ -889,7 +889,7 @@ fun PrivateChatSheet(
                 }
 
                 // TopBar (fixed at top, iOS-style)
-                BitchatSheetCenterTopBar(
+                BlueTalkSheetCenterTopBar(
                     onClose = onDismiss,
                     modifier = Modifier.align(Alignment.TopCenter),
                     navigationIcon = {

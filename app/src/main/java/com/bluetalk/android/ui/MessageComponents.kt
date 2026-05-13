@@ -29,7 +29,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import android.content.Intent
 import android.net.Uri
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import com.bluetalk.android.model.DeliveryStatus
 import com.bluetalk.android.mesh.BluetoothMeshService
 import java.text.SimpleDateFormat
@@ -42,7 +42,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import com.bluetalk.android.ui.media.FileMessageItem
-import com.bluetalk.android.model.BitchatMessageType
+import com.bluetalk.android.model.BlueTalkMessageType
 import com.bluetalk.android.R
 import androidx.compose.ui.res.stringResource
 
@@ -56,15 +56,15 @@ import androidx.compose.ui.res.stringResource
 
 @Composable
 fun MessagesList(
-    messages: List<BitchatMessage>,
+    messages: List<BlueTalkMessage>,
     currentUserNickname: String,
     meshService: BluetoothMeshService,
     modifier: Modifier = Modifier,
     forceScrollToBottom: Boolean = false,
     onScrolledUpChanged: ((Boolean) -> Unit)? = null,
     onNicknameClick: ((String) -> Unit)? = null,
-    onMessageLongPress: ((BitchatMessage) -> Unit)? = null,
-    onCancelTransfer: ((BitchatMessage) -> Unit)? = null,
+    onMessageLongPress: ((BlueTalkMessage) -> Unit)? = null,
+    onCancelTransfer: ((BlueTalkMessage) -> Unit)? = null,
     onImageClick: ((String, List<String>, Int) -> Unit)? = null
 ) {
     val listState = rememberLazyListState()
@@ -135,13 +135,13 @@ fun MessagesList(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageItem(
-    message: BitchatMessage,
+    message: BlueTalkMessage,
     currentUserNickname: String,
     meshService: BluetoothMeshService,
-    messages: List<BitchatMessage> = emptyList(),
+    messages: List<BlueTalkMessage> = emptyList(),
     onNicknameClick: ((String) -> Unit)? = null,
-    onMessageLongPress: ((BitchatMessage) -> Unit)? = null,
-    onCancelTransfer: ((BitchatMessage) -> Unit)? = null,
+    onMessageLongPress: ((BlueTalkMessage) -> Unit)? = null,
+    onCancelTransfer: ((BlueTalkMessage) -> Unit)? = null,
     onImageClick: ((String, List<String>, Int) -> Unit)? = null
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -198,20 +198,20 @@ fun MessageItem(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
     private fun MessageTextWithClickableNicknames(
-        message: BitchatMessage,
-        messages: List<BitchatMessage>,
+        message: BlueTalkMessage,
+        messages: List<BlueTalkMessage>,
         currentUserNickname: String,
         meshService: BluetoothMeshService,
         colorScheme: ColorScheme,
         timeFormatter: SimpleDateFormat,
         onNicknameClick: ((String) -> Unit)?,
-        onMessageLongPress: ((BitchatMessage) -> Unit)?,
-        onCancelTransfer: ((BitchatMessage) -> Unit)?,
+        onMessageLongPress: ((BlueTalkMessage) -> Unit)?,
+        onCancelTransfer: ((BlueTalkMessage) -> Unit)?,
         onImageClick: ((String, List<String>, Int) -> Unit)?,
         modifier: Modifier = Modifier
     ) {
     // Image special rendering
-    if (message.type == BitchatMessageType.Image) {
+    if (message.type == BlueTalkMessageType.Image) {
         com.bluetalk.android.ui.media.ImageMessageItem(
             message = message,
             messages = messages,
@@ -229,7 +229,7 @@ fun MessageItem(
     }
 
     // Voice note special rendering
-    if (message.type == BitchatMessageType.Audio) {
+    if (message.type == BlueTalkMessageType.Audio) {
         com.bluetalk.android.ui.media.AudioMessageItem(
             message = message,
             currentUserNickname = currentUserNickname,
@@ -245,7 +245,7 @@ fun MessageItem(
     }
 
     // File special rendering
-    if (message.type == BitchatMessageType.File) {
+    if (message.type == BlueTalkMessageType.File) {
         val path = message.content.trim()
         // Derive sending progress if applicable
         val (overrideProgress, _) = when (val st = message.deliveryStatus) {
@@ -289,9 +289,9 @@ fun MessageItem(
             val packet = try {
                 val file = java.io.File(path)
                 if (file.exists()) {
-                    // Create a temporary BitchatFilePacket for display
+                    // Create a temporary BlueTalkFilePacket for display
                     // In a real implementation, this would be stored with the packet metadata
-                    com.bluetalk.android.model.BitchatFilePacket(
+                    com.bluetalk.android.model.BlueTalkFilePacket(
                         fileName = file.name,
                         fileSize = file.length(),
                         mimeType = com.bluetalk.android.features.file.FileUtils.getMimeTypeFromExtension(file.name),

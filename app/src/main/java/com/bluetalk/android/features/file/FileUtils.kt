@@ -193,7 +193,7 @@ object FileUtils {
      */
     fun saveIncomingFile(
         context: Context,
-        file: com.bluetalk.android.model.BitchatFilePacket
+        file: com.bluetalk.android.model.BlueTalkFilePacket
     ): String {
         val lowerMime = file.mimeType.lowercase()
         val isImage = lowerMime.startsWith("image/")
@@ -263,14 +263,14 @@ object FileUtils {
     }
 
     /**
-     * Classify BitchatMessageType from MIME string used in file messages.
+     * Classify BlueTalkMessageType from MIME string used in file messages.
      */
-    fun messageTypeForMime(mime: String): com.bluetalk.android.model.BitchatMessageType {
+    fun messageTypeForMime(mime: String): com.bluetalk.android.model.BlueTalkMessageType {
         val lower = mime.lowercase()
         return when {
-            lower.startsWith("image/") -> com.bluetalk.android.model.BitchatMessageType.Image
-            lower.startsWith("audio/") -> com.bluetalk.android.model.BitchatMessageType.Audio
-            else -> com.bluetalk.android.model.BitchatMessageType.File
+            lower.startsWith("image/") -> com.bluetalk.android.model.BlueTalkMessageType.Image
+            lower.startsWith("audio/") -> com.bluetalk.android.model.BlueTalkMessageType.Audio
+            else -> com.bluetalk.android.model.BlueTalkMessageType.File
         }
     }
 

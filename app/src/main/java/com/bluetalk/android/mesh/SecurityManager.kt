@@ -2,7 +2,7 @@ package com.bluetalk.android.mesh
 
 import android.util.Log
 import com.bluetalk.android.crypto.EncryptionService
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.protocol.MessageType
 import com.bluetalk.android.model.RoutedPacket
 import com.bluetalk.android.util.toHexString
@@ -43,7 +43,7 @@ class SecurityManager(private val encryptionService: EncryptionService, private 
     /**
      * Validate packet security (timestamp, replay attacks, duplicates, signatures)
      */
-    fun validatePacket(packet: BitchatPacket, peerID: String): Boolean {
+    fun validatePacket(packet: BlueTalkPacket, peerID: String): Boolean {
         // Skip validation for our own packets
         if (peerID == myPeerID) {
             Log.d(TAG, "Skipping validation for our own packet")
@@ -156,7 +156,7 @@ class SecurityManager(private val encryptionService: EncryptionService, private 
     /**
      * Verify packet signature
      */
-    fun verifySignature(packet: BitchatPacket, peerID: String): Boolean {
+    fun verifySignature(packet: BlueTalkPacket, peerID: String): Boolean {
         return packet.signature?.let { signature ->
             try {
                 val isValid = encryptionService.verify(signature, packet.payload, peerID)
@@ -217,7 +217,7 @@ class SecurityManager(private val encryptionService: EncryptionService, private 
     /**
      * Generate message ID for duplicate detection
      */
-    private fun generateMessageID(packet: BitchatPacket, peerID: String): String {
+    private fun generateMessageID(packet: BlueTalkPacket, peerID: String): String {
         return when (MessageType.fromValue(packet.type)) {
             MessageType.FRAGMENT -> {
                 // For fragments, include the payload hash to distinguish different fragments
@@ -235,7 +235,7 @@ class SecurityManager(private val encryptionService: EncryptionService, private 
      * Verify packet signature using peer's signing public key
      * Returns true only if signature is present and valid
      */
-    private fun verifyPacketSignature(packet: BitchatPacket, peerID: String): Boolean {
+    private fun verifyPacketSignature(packet: BlueTalkPacket, peerID: String): Boolean {
         try {
             // only verify ANNOUNCE, MESSAGE, and FILE_TRANSFER
             if (MessageType.fromValue(packet.type) !in setOf(

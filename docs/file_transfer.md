@@ -1,6 +1,6 @@
-# Bitchat Bluetooth File Transfer: Images, Audio, and Generic Files (with Interactive Features)
+# BlueTalk Bluetooth File Transfer: Images, Audio, and Generic Files (with Interactive Features)
 
-This document is the exhaustive implementation guide for Bitchat’s Bluetooth file transfer protocol for voice notes (audio) and images, including interactive features like waveform seeking. It describes the on‑wire packet format (both v1 and v2), fragmentation/progress/cancellation, sender/receiver behaviors, and the complete UX we implemented in the Android client so that other implementers can interoperate and match the user experience precisely.
+This document is the exhaustive implementation guide for BlueTalk’s Bluetooth file transfer protocol for voice notes (audio) and images, including interactive features like waveform seeking. It describes the on‑wire packet format (both v1 and v2), fragmentation/progress/cancellation, sender/receiver behaviors, and the complete UX we implemented in the Android client so that other implementers can interoperate and match the user experience precisely.
 
 **Protocol Versions:**
 - **v1**: Original protocol with 2‑byte payload length (≤ 64 KiB files)
@@ -14,7 +14,7 @@ This document is the exhaustive implementation guide for Bitchat’s Bluetooth f
 
 The guide is organized into:
 
-- Protocol overview (BitchatPacket + File Transfer payload)
+- Protocol overview (BlueTalkPacket + File Transfer payload)
 - Fragmentation, progress reporting, and cancellation
 - Receive path, validation, and persistence
 - Sender path (audio + images)
@@ -27,9 +27,9 @@ The guide is organized into:
 
 ## 1) Protocol Overview
 
-Bitchat BLE transport carries application messages inside the common `BitchatPacket` envelope. File transfer reuses the same envelope as public and private messages, with a distinct `type` and a TLV‑encoded payload.
+BlueTalk BLE transport carries application messages inside the common `BlueTalkPacket` envelope. File transfer reuses the same envelope as public and private messages, with a distinct `type` and a TLV‑encoded payload.
 
-### 1.1 BitchatPacket envelope
+### 1.1 BlueTalkPacket envelope
 
 Fields (subset relevant to file transfer):
 
@@ -91,11 +91,11 @@ PayloadLength: 4 bytes (big-endian, max ~4 GiB)
 - Clients sending file transfers should preferentially use v2 format.
 - Fragmentation still applies: large files are split into fragments that fit within BLE MTU constraints (~128 KiB per fragment).
 
-### 1.3 File Transfer TLV payload (BitchatFilePacket)
+### 1.3 File Transfer TLV payload (BlueTalkFilePacket)
 
 The file payload is a TLV structure with mixed length field sizes to support large contents efficiently.
 
-- Defined in `app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt)
+- Defined in `app/src/main/java/com/bluetalk/android/model/BlueTalkFilePacket.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/model/BlueTalkFilePacket.kt)
 
 Canonical TLVs (v2 spec):
 
@@ -182,7 +182,7 @@ Implementation files:
 
 Receiver dispatch is in `MessageHandler`:
 
-- For both broadcast and private paths we try `BitchatFilePacket.decode(payload)`. If it decodes:
+- For both broadcast and private paths we try `BlueTalkFilePacket.decode(payload)`. If it decodes:
   - The file is persisted under app files with type‑specific subfolders:
     - Audio: `files/voicenotes/incoming/`
     - Image: `files/images/incoming/`
@@ -216,11 +216,11 @@ Files:
    - Files saved under `files/voicenotes/outgoing/voice_YYYYMMDD_HHMMSS.m4a`.
 
 2) Local echo
-   - We create a `BitchatMessage` with content `"[voice] <path>"` and add to the appropriate timeline (public/channel/private).
+   - We create a `BlueTalkMessage` with content `"[voice] <path>"` and add to the appropriate timeline (public/channel/private).
    - For private: `messageManager.addPrivateMessage(peerID, message)`. For public/channel: `messageManager.addMessage(message)` or add to channel.
 
 3) Packet creation
-   - Build a `BitchatFilePacket`:
+   - Build a `BlueTalkFilePacket`:
      - `fileName`: basename (e.g., `voice_… .m4a`)
      - `fileSize`: file length
      - `mimeType`: `audio/mp4`
@@ -239,7 +239,7 @@ Files:
 Core files:
 
 - `app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt` (sendVoiceNote) (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt)
-- `app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt)
+- `app/src/main/java/com/bluetalk/android/model/BlueTalkFilePacket.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/model/BlueTalkFilePacket.kt)
 - `app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt)
 - `app/src/main/java/com/bluetalk/android/features/voice/VoiceRecorder.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/voice/VoiceRecorder.kt)
 - `app/src/main/java/com/bluetalk/android/features/voice/Waveform.kt` (cache + extractor) (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/voice/Waveform.kt)
@@ -255,7 +255,7 @@ Core files:
    - Insert a message with `"[image] <path>"` in the current context (public/channel/private).
 
 3) Packet creation
-   - Build `BitchatFilePacket` with mime `image/jpeg` and file content.
+   - Build `BlueTalkFilePacket` with mime `image/jpeg` and file content.
    - Encode TLV + compute `transferId` and map to `messageId`.
 
 4) Send
@@ -383,7 +383,7 @@ Files:
 
 Core protocol and transport:
 
-- `app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt` — TLV payload model + encode/decode. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt)
+- `app/src/main/java/com/bluetalk/android/model/BlueTalkFilePacket.kt` — TLV payload model + encode/decode. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/model/BlueTalkFilePacket.kt)
 - `app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt` — packet creation and broadcast for file messages. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt)
 - `app/src/main/java/com/bluetalk/android/mesh/BluetoothPacketBroadcaster.kt` — fragmentation, progress, cancellation via transfer jobs. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothPacketBroadcaster.kt)
 - `app/src/main/java/com/bluetalk/android/mesh/TransferProgressManager.kt` — progress events bus. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/TransferProgressManager.kt)
@@ -422,11 +422,11 @@ Fullscreen image:
 ## 8) Implementation Checklist for Other Clients
 
 1. **Implement v2 protocol support**: Support both v1 (2-byte payload length) and v2 (4-byte payload length) packet decoding. Use v2 format for file transfer packets to enable large file transfers.
-2. Implement `BitchatFilePacket` TLV exactly as specified:
+2. Implement `BlueTalkFilePacket` TLV exactly as specified:
    - FILE_NAME and MIME_TYPE: `type(1) + len(2) + value`
    - FILE_SIZE: `type(1) + len(2=4) + value(4, UInt32 BE)`
    - CONTENT: `type(1) + len(4) + value`
-3. Embed the TLV into a `BitchatPacket` envelope with `type = FILE_TRANSFER (0x22)` and the correct `recipientID` (broadcast vs private).
+3. Embed the TLV into a `BlueTalkPacket` envelope with `type = FILE_TRANSFER (0x22)` and the correct `recipientID` (broadcast vs private).
 4. Fragment, send, and report progress using a transfer ID derived from `sha256(payload)` so the UI can map progress to a message.
 5. Support cancellation at the fragment sender: stop sending remaining fragments and propagate a cancel to the UI (we remove the message).
 6. On receive, decode TLV, persist to an app directory (separate audio/images/other), and create a chat message with content marker `"[voice] path"`, `"[image] path"`, or `"[file] path"` for local rendering.

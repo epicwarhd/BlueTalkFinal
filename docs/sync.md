@@ -1,10 +1,10 @@
 # GCS Filter Sync (REQUEST_SYNC)
 
-This document specifies the gossip-based synchronization feature for BitChat, inspired by Plumtree. It ensures eventual consistency of public packets (ANNOUNCE and broadcast MESSAGE) across nodes via periodic sync requests containing a compact Golomb‑Coded Set (GCS) of recently seen packets.
+This document specifies the gossip-based synchronization feature for BlueTalk, inspired by Plumtree. It ensures eventual consistency of public packets (ANNOUNCE and broadcast MESSAGE) across nodes via periodic sync requests containing a compact Golomb‑Coded Set (GCS) of recently seen packets.
 
 ## Overview
 
-- Each node maintains a rolling set of public BitChat packets it has seen recently:
+- Each node maintains a rolling set of public BlueTalk packets it has seen recently:
   - Broadcast messages (MessageType.MESSAGE where recipient is broadcast)
   - Identity announcements (MessageType.ANNOUNCE)
   - Default retention is 100 recent packets (configurable in the debug sheet). This value is the maximum number of packets that are synchronized per request (across both types combined).
@@ -51,7 +51,7 @@ Hashing scheme (fixed for cross‑impl compatibility):
 
 MessageType: `REQUEST_SYNC (0x21)`
 
-- Header: normal BitChat header with TTL indicating “local-only” semantics. Implementations SHOULD set TTL=0 to prevent any relay; neighbors still receive the packet over the direct link-layer. For periodic sync, recipient is broadcast; for per-peer initial sync, recipient is the specific peer.
+- Header: normal BlueTalk header with TTL indicating “local-only” semantics. Implementations SHOULD set TTL=0 to prevent any relay; neighbors still receive the packet over the direct link-layer. For periodic sync, recipient is broadcast; for per-peer initial sync, recipient is the specific peer.
 - Payload: TLV with 16‑bit big‑endian length fields (type, length16, value)
   - 0x01: P (uint8) — Golomb‑Rice parameter
   - 0x02: M (uint32) — hash range N * 2^P

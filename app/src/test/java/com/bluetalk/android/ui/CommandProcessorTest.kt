@@ -3,7 +3,7 @@ package com.bluetalk.android.ui
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.bluetalk.android.mesh.BluetoothMeshService
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope

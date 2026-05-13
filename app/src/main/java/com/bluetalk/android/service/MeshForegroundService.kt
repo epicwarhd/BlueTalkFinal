@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 class MeshForegroundService : Service() {
 
     companion object {
-        private const val CHANNEL_ID = "bitchat_mesh_service"
+        private const val CHANNEL_ID = "bluetalk_mesh_service"
         private const val NOTIFICATION_ID = 10001
 
         const val ACTION_START = "com.bluetalk.android.service.START"
@@ -287,7 +287,7 @@ class MeshForegroundService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or (if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0)
         )
 
-        // Action: Quit Bitchat
+        // Action: Quit BlueTalk
         val quitIntent = Intent(this, MeshForegroundService::class.java).apply { action = ACTION_QUIT }
         val quitPendingIntent = PendingIntent.getService(
             this, 1, quitIntent,
@@ -309,7 +309,7 @@ class MeshForegroundService : Service() {
             // Add an action button that appears when notification is expanded
             .addAction(
                 android.R.drawable.ic_menu_close_clear_cancel,
-                getString(R.string.notification_action_quit_bitchat),
+                getString(R.string.notification_action_quit_bluetalk),
                 quitPendingIntent
             )
             .build()

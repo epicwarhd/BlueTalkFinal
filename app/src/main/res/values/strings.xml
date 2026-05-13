@@ -42,7 +42,7 @@
   <string name="notification_summary_more">and %1$d more</string>
   <string name="notification_messages_from_people">%1$d messages from %2$d people</string>
   <string name="notification_more_conversations">and %1$d more conversations</string>
-  <string name="notification_active_peers_title">👥 bitchatters nearby!</string>
+  <string name="notification_active_peers_title">👥 bluetalkers nearby!</string>
   <string name="notification_active_peers_one">1 person around</string>
   <string name="notification_active_peers_many">%1$d people around</string>
   <string name="notification_new_messages">New Messages</string>
@@ -157,7 +157,7 @@
   <string name="cd_remove_bookmark">Remove bookmark</string>
   <string name="cd_teleport">Teleport</string>
   <string name="cd_selected">Selected</string>
-  <string name="notification_action_quit_bitchat">Quit bluetalk</string>
+  <string name="notification_action_quit_bluetalk">Quit bluetalk</string>
   <string name="about_background_title">run in background</string>
   <string name="about_background_desc">keep mesh active when app is closed (foreground service)</string>
   <string name="cd_leave_channel">Leave channel</string>

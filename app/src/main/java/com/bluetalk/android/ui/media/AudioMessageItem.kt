@@ -22,20 +22,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.bluetalk.android.R
 import com.bluetalk.android.mesh.BluetoothMeshService
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import androidx.compose.material3.ColorScheme
 import java.text.SimpleDateFormat
 
 @Composable
 fun AudioMessageItem(
-    message: BitchatMessage,
+    message: BlueTalkMessage,
     currentUserNickname: String,
     meshService: BluetoothMeshService,
     colorScheme: ColorScheme,
     timeFormatter: SimpleDateFormat,
     onNicknameClick: ((String) -> Unit)?,
-    onMessageLongPress: ((BitchatMessage) -> Unit)?,
-    onCancelTransfer: ((BitchatMessage) -> Unit)?,
+    onMessageLongPress: ((BlueTalkMessage) -> Unit)?,
+    onCancelTransfer: ((BlueTalkMessage) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     val path = message.content.trim()

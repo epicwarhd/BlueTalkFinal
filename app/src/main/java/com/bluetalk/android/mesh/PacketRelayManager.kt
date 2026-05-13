@@ -3,7 +3,7 @@ import com.bluetalk.android.protocol.MessageType
 
 import android.util.Log
 import com.bluetalk.android.model.RoutedPacket
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.util.toHexString
 import kotlinx.coroutines.*
 import kotlin.random.Random
@@ -109,7 +109,7 @@ class PacketRelayManager(private val myPeerID: String) {
     /**
      * Check if a packet is specifically addressed to us
      */
-    internal fun isPacketAddressedToMe(packet: BitchatPacket): Boolean {
+    internal fun isPacketAddressedToMe(packet: BlueTalkPacket): Boolean {
         val recipientID = packet.recipientID
         
         // No recipient means broadcast (not addressed to us specifically)
@@ -131,7 +131,7 @@ class PacketRelayManager(private val myPeerID: String) {
     /**
      * Determine if we should relay this packet based on type and network conditions
      */
-    private fun shouldRelayPacket(packet: BitchatPacket, fromPeerID: String): Boolean {
+    private fun shouldRelayPacket(packet: BlueTalkPacket, fromPeerID: String): Boolean {
         // Always relay if TTL is high enough (indicates important message)
         if (packet.ttl >= 4u) {
             Log.d(TAG, "High TTL (${packet.ttl}), relaying")

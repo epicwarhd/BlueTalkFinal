@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.bluetalk.android.R
 import com.bluetalk.android.features.file.FileUtils
-import com.bluetalk.android.model.BitchatFilePacket
+import com.bluetalk.android.model.BlueTalkFilePacket
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -35,7 +35,7 @@ import java.io.File
  */
 @Composable
 fun FileViewerDialog(
-    packet: BitchatFilePacket,
+    packet: BlueTalkFilePacket,
     onDismiss: () -> Unit,
     onSaveToDevice: (ByteArray, String) -> Unit
 ) {
@@ -132,10 +132,10 @@ fun FileViewerDialog(
 /**
  * Attempts to open a file using system viewers or save to device
  */
-private fun tryOpenFile(context: Context, packet: BitchatFilePacket) {
+private fun tryOpenFile(context: Context, packet: BlueTalkFilePacket) {
     try {
         // First try to save to temp file and open
-        val tempFile = File.createTempFile("bitchat_", ".${packet.fileName.substringAfterLast(".")}", context.cacheDir)
+        val tempFile = File.createTempFile("bluetalk_", ".${packet.fileName.substringAfterLast(".")}", context.cacheDir)
         tempFile.writeBytes(packet.content)
         tempFile.deleteOnExit()
 

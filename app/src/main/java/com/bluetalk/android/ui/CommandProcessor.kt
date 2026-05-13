@@ -1,7 +1,7 @@
 package com.bluetalk.android.ui
 
 import com.bluetalk.android.mesh.BluetoothMeshService
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import java.util.Date
 
 /**
@@ -58,7 +58,7 @@ class CommandProcessor(
             val password = if (parts.size > 2) parts[2] else null
             val success = channelManager.joinChannel(channel, password, myPeerID)
             if (success) {
-                val systemMessage = BitchatMessage(
+                val systemMessage = BlueTalkMessage(
                     sender = "system",
                     content = "joined channel $channel",
                     timestamp = Date(),
@@ -67,7 +67,7 @@ class CommandProcessor(
                 messageManager.addMessage(systemMessage)
             }
         } else {
-            val systemMessage = BitchatMessage(
+            val systemMessage = BlueTalkMessage(
                 sender = "system",
                 content = "usage: /join <channel>",
                 timestamp = Date(),
@@ -100,7 +100,7 @@ class CommandProcessor(
                             sendPrivateMessageVia(meshService, content, peerIdParam, recipientNicknameParam, messageId)
                         }
                     } else {
-                        val systemMessage = BitchatMessage(
+                        val systemMessage = BlueTalkMessage(
                             sender = "system",
                             content = "started private chat with $targetName",
                             timestamp = Date(),
@@ -110,7 +110,7 @@ class CommandProcessor(
                     }
                 }
             } else {
-                val systemMessage = BitchatMessage(
+                val systemMessage = BlueTalkMessage(
                     sender = "system",
                     content = "user '$targetName' not found. they may be offline or using a different nickname.",
                     timestamp = Date(),
@@ -119,7 +119,7 @@ class CommandProcessor(
                 messageManager.addMessage(systemMessage)
             }
         } else {
-            val systemMessage = BitchatMessage(
+            val systemMessage = BlueTalkMessage(
                 sender = "system",
                 content = "usage: /msg <nickname> [message]",
                 timestamp = Date(),
@@ -170,7 +170,7 @@ class CommandProcessor(
             Pair(peerList, "online users")
         }
         
-        val systemMessage = BitchatMessage(
+        val systemMessage = BlueTalkMessage(
             sender = "system",
             content = if (peerList.isEmpty()) {
                 "no one else is around right now."
@@ -206,7 +206,7 @@ class CommandProcessor(
         val currentChannel = state.getCurrentChannelValue()
 
         if (currentChannel == null) {
-            val systemMessage = BitchatMessage(
+            val systemMessage = BlueTalkMessage(
                 sender = "system",
                 content = "you must be in a channel to set a password.",
                 timestamp = Date(),
@@ -218,7 +218,7 @@ class CommandProcessor(
 
         if (parts.size == 2){
             if(!channelManager.isChannelCreator(channel = currentChannel, peerID = peerID)){
-                val systemMessage = BitchatMessage(
+                val systemMessage = BlueTalkMessage(
                     sender = "system",
                     content = "you must be the channel creator to set a password.",
                     timestamp = Date(),
@@ -229,7 +229,7 @@ class CommandProcessor(
             }
             val newPassword = parts[1]
             channelManager.setChannelPassword(currentChannel, newPassword)
-            val systemMessage = BitchatMessage(
+            val systemMessage = BlueTalkMessage(
                 sender = "system",
                 content = "password changed for channel $currentChannel",
                 timestamp = Date(),
@@ -238,7 +238,7 @@ class CommandProcessor(
             channelManager.addChannelMessage(currentChannel,systemMessage,null)
         }
         else{
-            val systemMessage = BitchatMessage(
+            val systemMessage = BlueTalkMessage(
                 sender = "system",
                 content = "usage: /pass <password>",
                 timestamp = Date(),
@@ -255,7 +255,7 @@ class CommandProcessor(
         } else {
             // List blocked users
             val blockedInfo = privateChatManager.listBlockedUsers()
-            val systemMessage = BitchatMessage(
+            val systemMessage = BlueTalkMessage(
                 sender = "system",
                 content = blockedInfo,
                 timestamp = Date(),
@@ -270,7 +270,7 @@ class CommandProcessor(
             val targetName = parts[1].removePrefix("@")
             privateChatManager.unblockPeerByNickname(targetName, meshService)
         } else {
-            val systemMessage = BitchatMessage(
+            val systemMessage = BlueTalkMessage(
                 sender = "system",
                 content = "usage: /unblock <nickname>",
                 timestamp = Date(),
@@ -312,7 +312,7 @@ class CommandProcessor(
                 // Let the transport layer add the echo; just send it out
                 onSendMessage(actionMessage, emptyList(), null)
             } else {
-                val message = BitchatMessage(
+                val message = BlueTalkMessage(
                     sender = state.getNicknameValue() ?: myPeerID,
                     content = actionMessage,
                     timestamp = Date(),
@@ -330,7 +330,7 @@ class CommandProcessor(
                 }
             }
         } else {
-            val systemMessage = BitchatMessage(
+            val systemMessage = BlueTalkMessage(
                 sender = "system",
                 content = "usage: /${parts[0].removePrefix("/")} <nickname>",
                 timestamp = Date(),
@@ -348,7 +348,7 @@ class CommandProcessor(
             "joined channels: ${allChannels.joinToString(", ")}"
         }
         
-        val systemMessage = BitchatMessage(
+        val systemMessage = BlueTalkMessage(
             sender = "system",
             content = channelList,
             timestamp = Date(),
@@ -358,7 +358,7 @@ class CommandProcessor(
     }
     
     private fun handleUnknownCommand(cmd: String) {
-        val systemMessage = BitchatMessage(
+        val systemMessage = BlueTalkMessage(
             sender = "system",
             content = "unknown command: $cmd. type / to see available commands.",
             timestamp = Date(),

@@ -26,9 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bluetalk.android.core.ui.component.sheet.BitchatBottomSheet
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTopBar
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTitle
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkBottomSheet
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTopBar
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTitle
 import com.bluetalk.android.geohash.GeohashChannelLevel
 import com.bluetalk.android.geohash.LocationChannelManager
 import com.bluetalk.android.nostr.LocationNotesManager
@@ -106,7 +106,7 @@ fun LocationNotesSheet(
         }
     }
 
-    BitchatBottomSheet(
+    BlueTalkBottomSheet(
         onDismissRequest = onDismiss,
         modifier = modifier,
     ) {
@@ -168,11 +168,11 @@ fun LocationNotesSheet(
             }
 
             // TopBar (animated)
-            BitchatSheetTopBar(
+            BlueTalkSheetTopBar(
                 onClose = onDismiss,
                 modifier = Modifier.align(Alignment.TopCenter),
                 title = {
-                    BitchatSheetTitle(
+                    BlueTalkSheetTitle(
                         text = pluralStringResource(
                             id = R.plurals.location_notes_title,
                             count = count,

@@ -191,7 +191,7 @@ class GeohashViewModel(
             try {
                 val tempId = "temp_${System.currentTimeMillis()}_${kotlin.random.Random.nextInt(1000)}"
                 val pow = PoWPreferenceManager.getCurrentSettings()
-                val localMsg = com.bluetalk.android.model.BitchatMessage(
+                val localMsg = com.bluetalk.android.model.BlueTalkMessage(
                     id = tempId,
                     sender = nickname ?: myPeerID,
                     content = content,
@@ -310,7 +310,7 @@ class GeohashViewModel(
             // Refresh people list and counts to remove blocked entry immediately
             repo.refreshGeohashPeople()
             repo.updateReactiveParticipantCounts()
-            val sysMsg = com.bluetalk.android.model.BitchatMessage(
+            val sysMsg = com.bluetalk.android.model.BlueTalkMessage(
                 sender = "system",
                 content = "blocked $targetNickname in geohash channels",
                 timestamp = Date(),
@@ -318,7 +318,7 @@ class GeohashViewModel(
             )
             messageManager.addMessage(sysMsg)
         } else {
-            val sysMsg = com.bluetalk.android.model.BitchatMessage(
+            val sysMsg = com.bluetalk.android.model.BlueTalkMessage(
                 sender = "system",
                 content = "user '$targetNickname' not found in current geohash",
                 timestamp = Date(),

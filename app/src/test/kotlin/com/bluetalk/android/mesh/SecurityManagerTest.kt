@@ -3,7 +3,7 @@ package com.bluetalk.android.mesh
 import android.os.Build
 import com.bluetalk.android.crypto.EncryptionService
 import com.bluetalk.android.model.IdentityAnnouncement
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.protocol.MessageType
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -77,7 +77,7 @@ class SecurityManagerTest {
 
     @Test
     fun `validatePacket - rejects packet with missing signature`() {
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.MESSAGE.value,
             ttl = 10u,
             senderID = otherPeerID,
@@ -94,7 +94,7 @@ class SecurityManagerTest {
     fun `validatePacket - rejects packet with invalid signature`() {
         setupKnownPeer(otherPeerID, otherSigningKey)
         
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.MESSAGE.value,
             ttl = 10u,
             senderID = otherPeerID,
@@ -111,7 +111,7 @@ class SecurityManagerTest {
     fun `validatePacket - rejects packet from unknown peer (no key)`() {
         whenever(mockDelegate.getPeerInfo(unknownPeerID)).thenReturn(null)
         
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.MESSAGE.value,
             ttl = 10u,
             senderID = unknownPeerID,
@@ -128,7 +128,7 @@ class SecurityManagerTest {
     fun `validatePacket - accepts packet with valid signature from known peer`() {
         setupKnownPeer(otherPeerID, otherSigningKey)
         
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.MESSAGE.value,
             ttl = 10u,
             senderID = otherPeerID,
@@ -150,7 +150,7 @@ class SecurityManagerTest {
         )
         val payload = announcement.encode()!!
         
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.ANNOUNCE.value,
             ttl = 10u,
             senderID = unknownPeerID,
@@ -177,7 +177,7 @@ class SecurityManagerTest {
         )
         val payload = announcement.encode()!!
         
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.ANNOUNCE.value,
             ttl = 10u,
             senderID = unknownPeerID,
@@ -192,7 +192,7 @@ class SecurityManagerTest {
     
     @Test
     fun `validatePacket - rejects ANNOUNCE packet with malformed payload`() {
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.ANNOUNCE.value,
             ttl = 10u,
             senderID = unknownPeerID,
@@ -207,7 +207,7 @@ class SecurityManagerTest {
 
     @Test
     fun `validatePacket - ignores own packets`() {
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.MESSAGE.value,
             ttl = 10u,
             senderID = myPeerID,
@@ -224,7 +224,7 @@ class SecurityManagerTest {
     fun `validatePacket - detects duplicates`() {
         setupKnownPeer(otherPeerID, otherSigningKey)
         
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.MESSAGE.value,
             ttl = 10u,
             senderID = otherPeerID,
@@ -249,7 +249,7 @@ class SecurityManagerTest {
         val payload = announcement.encode()!!
         
         // 1. Initial Announce (Fresh)
-        val packet1 = BitchatPacket(
+        val packet1 = BlueTalkPacket(
             type = MessageType.ANNOUNCE.value,
             ttl = com.bluetalk.android.util.AppConstants.MESSAGE_TTL_HOPS, // 7u
             senderID = unknownPeerID,

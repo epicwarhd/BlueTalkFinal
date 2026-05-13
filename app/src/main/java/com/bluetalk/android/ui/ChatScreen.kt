@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import com.bluetalk.android.ui.media.FullScreenImageViewer
 
 /**
@@ -68,7 +68,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
     var showLocationNotesSheet by remember { mutableStateOf(false) }
     var showUserSheet by remember { mutableStateOf(false) }
     var selectedUserForSheet by remember { mutableStateOf("") }
-    var selectedMessageForSheet by remember { mutableStateOf<BitchatMessage?>(null) }
+    var selectedMessageForSheet by remember { mutableStateOf<BlueTalkMessage?>(null) }
     var showFullScreenImageViewer by remember { mutableStateOf(false) }
     var viewerImagePaths by remember { mutableStateOf(emptyList<String>()) }
     var initialViewerIndex by remember { mutableStateOf(0) }
@@ -481,7 +481,7 @@ private fun ChatDialogs(
     showUserSheet: Boolean,
     onUserSheetDismiss: () -> Unit,
     selectedUserForSheet: String,
-    selectedMessageForSheet: BitchatMessage?,
+    selectedMessageForSheet: BlueTalkMessage?,
     viewModel: ChatViewModel,
     showVerificationSheet: Boolean,
     onVerificationSheetDismiss: () -> Unit,

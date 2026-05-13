@@ -1,7 +1,7 @@
 package com.bluetalk.android.mesh
 
 import android.util.Log
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.protocol.MessageType
 import com.bluetalk.android.model.RoutedPacket
 import kotlinx.coroutines.*
@@ -301,7 +301,7 @@ class PacketProcessor(private val myPeerID: String) {
  */
 interface PacketProcessorDelegate {
     // Security validation
-    fun validatePacketSecurity(packet: BitchatPacket, peerID: String): Boolean
+    fun validatePacketSecurity(packet: BlueTalkPacket, peerID: String): Boolean
     
     // Peer management
     fun updatePeerLastSeen(peerID: String)
@@ -317,7 +317,7 @@ interface PacketProcessorDelegate {
     fun handleAnnounce(routed: RoutedPacket)
     fun handleMessage(routed: RoutedPacket)
     fun handleLeave(routed: RoutedPacket)
-    fun handleFragment(packet: BitchatPacket): BitchatPacket?
+    fun handleFragment(packet: BlueTalkPacket): BlueTalkPacket?
     fun handleRequestSync(routed: RoutedPacket)
     
     // Communication

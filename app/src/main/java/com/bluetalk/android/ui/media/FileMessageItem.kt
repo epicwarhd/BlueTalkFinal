@@ -33,14 +33,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bluetalk.android.features.file.FileUtils
-import com.bluetalk.android.model.BitchatFilePacket
+import com.bluetalk.android.model.BlueTalkFilePacket
 
 /**
  * Modern chat-style file message display
  */
 @Composable
 fun FileMessageItem(
-    packet: BitchatFilePacket,
+    packet: BlueTalkFilePacket,
     onFileClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

@@ -4,20 +4,20 @@ import android.util.Base64
 import android.util.Log
 import com.bluetalk.android.model.PrivateMessagePacket
 import com.bluetalk.android.model.NoisePayloadType
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.protocol.MessageType
 import java.util.*
 
 /**
- * BitChat-over-Nostr Adapter
+ * BlueTalk-over-Nostr Adapter
  * Direct port from iOS implementation for 100% compatibility
  */
-object NostrEmbeddedBitChat {
+object NostrEmbeddedBlueTalk {
     
-    private const val TAG = "NostrEmbeddedBitChat"
+    private const val TAG = "NostrEmbeddedBlueTalk"
     
     /**
-     * Build a `bitchat1:` base64url-encoded BitChat packet carrying a private message for Nostr DMs.
+     * Build a `bluetalk1:` base64url-encoded BlueTalk packet carrying a private message for Nostr DMs.
      */
     fun encodePMForNostr(
         content: String,
@@ -38,7 +38,7 @@ object NostrEmbeddedBitChat {
             // Determine 8-byte recipient ID to embed
             val recipientIDHex = normalizeRecipientPeerID(recipientPeerID)
             
-            val packet = BitchatPacket(
+            val packet = BlueTalkPacket(
                 version = 1u,
                 type = MessageType.NOISE_ENCRYPTED.value,
                 senderID = hexStringToByteArray(senderPeerID),
@@ -50,7 +50,7 @@ object NostrEmbeddedBitChat {
             )
             
             val data = packet.toBinaryData() ?: return null
-            return "bitchat1:" + base64URLEncode(data)
+            return "bluetalk1:" + base64URLEncode(data)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to encode PM for Nostr: ${e.message}")
             return null
@@ -58,7 +58,7 @@ object NostrEmbeddedBitChat {
     }
     
     /**
-     * Build a `bitchat1:` base64url-encoded BitChat packet carrying a delivery/read ack for Nostr DMs.
+     * Build a `bluetalk1:` base64url-encoded BlueTalk packet carrying a delivery/read ack for Nostr DMs.
      */
     fun encodeAckForNostr(
         type: NoisePayloadType,
@@ -78,7 +78,7 @@ object NostrEmbeddedBitChat {
             
             val recipientIDHex = normalizeRecipientPeerID(recipientPeerID)
             
-            val packet = BitchatPacket(
+            val packet = BlueTalkPacket(
                 version = 1u,
                 type = MessageType.NOISE_ENCRYPTED.value,
                 senderID = hexStringToByteArray(senderPeerID),
@@ -90,7 +90,7 @@ object NostrEmbeddedBitChat {
             )
             
             val data = packet.toBinaryData() ?: return null
-            return "bitchat1:" + base64URLEncode(data)
+            return "bluetalk1:" + base64URLEncode(data)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to encode ACK for Nostr: ${e.message}")
             return null
@@ -98,7 +98,7 @@ object NostrEmbeddedBitChat {
     }
     
     /**
-     * Build a `bitchat1:` ACK (delivered/read) without an embedded recipient peer ID (geohash DMs).
+     * Build a `bluetalk1:` ACK (delivered/read) without an embedded recipient peer ID (geohash DMs).
      */
     fun encodeAckForNostrNoRecipient(
         type: NoisePayloadType,
@@ -115,7 +115,7 @@ object NostrEmbeddedBitChat {
             val messageIDBytes = messageID.toByteArray(Charsets.UTF_8)
             System.arraycopy(messageIDBytes, 0, payload, 1, messageIDBytes.size)
             
-            val packet = BitchatPacket(
+            val packet = BlueTalkPacket(
                 version = 1u,
                 type = MessageType.NOISE_ENCRYPTED.value,
                 senderID = hexStringToByteArray(senderPeerID),
@@ -127,7 +127,7 @@ object NostrEmbeddedBitChat {
             )
             
             val data = packet.toBinaryData() ?: return null
-            return "bitchat1:" + base64URLEncode(data)
+            return "bluetalk1:" + base64URLEncode(data)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to encode ACK for Nostr (no recipient): ${e.message}")
             return null
@@ -135,7 +135,7 @@ object NostrEmbeddedBitChat {
     }
     
     /**
-     * Build a `bitchat1:` payload without an embedded recipient peer ID (used for geohash DMs).
+     * Build a `bluetalk1:` payload without an embedded recipient peer ID (used for geohash DMs).
      */
     fun encodePMForNostrNoRecipient(
         content: String,
@@ -150,7 +150,7 @@ object NostrEmbeddedBitChat {
             payload[0] = NoisePayloadType.PRIVATE_MESSAGE.value.toByte()
             System.arraycopy(tlv, 0, payload, 1, tlv.size)
             
-            val packet = BitchatPacket(
+            val packet = BlueTalkPacket(
                 version = 1u,
                 type = MessageType.NOISE_ENCRYPTED.value,
                 senderID = hexStringToByteArray(senderPeerID),
@@ -162,7 +162,7 @@ object NostrEmbeddedBitChat {
             )
             
             val data = packet.toBinaryData() ?: return null
-            return "bitchat1:" + base64URLEncode(data)
+            return "bluetalk1:" + base64URLEncode(data)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to encode PM for Nostr (no recipient): ${e.message}")
             return null

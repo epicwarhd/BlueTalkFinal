@@ -11,9 +11,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bluetalk.android.core.ui.component.sheet.BitchatBottomSheet
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTopBar
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTitle
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkBottomSheet
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTopBar
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTitle
 import com.bluetalk.android.geohash.GeohashChannelLevel
 import com.bluetalk.android.geohash.LocationChannelManager
 import com.bluetalk.android.R
@@ -70,7 +70,7 @@ fun LocationNotesSheetPresenter(
 private fun LocationNotesAcquiringSheet(
     onDismiss: () -> Unit
 ) {
-    BitchatBottomSheet(
+    BlueTalkBottomSheet(
         onDismissRequest = onDismiss,
     ) {
         Column(
@@ -108,7 +108,7 @@ private fun LocationNotesErrorSheet(
     onDismiss: () -> Unit,
     locationManager: LocationChannelManager
 ) {
-    BitchatBottomSheet(
+    BlueTalkBottomSheet(
         onDismissRequest = onDismiss,
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -143,11 +143,11 @@ private fun LocationNotesErrorSheet(
                 }
             }
 
-            BitchatSheetTopBar(
+            BlueTalkSheetTopBar(
                 onClose = onDismiss,
                 modifier = Modifier.align(Alignment.TopCenter),
                 title = {
-                    BitchatSheetTitle(
+                    BlueTalkSheetTitle(
                         text = stringResource(R.string.cd_location_notes).uppercase()
                     )
                 }

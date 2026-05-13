@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/188c42f8-d249-4a72-b27a-e2b4f10a00a8" alt="Bitchat Android Logo" width="480">
+    <img src="https://github.com/user-attachments/assets/188c42f8-d249-4a72-b27a-e2b4f10a00a8" alt="BlueTalk Android Logo" width="480">
 </p>
 
 > [!WARNING]
@@ -7,7 +7,7 @@
 
 # bluetalk for Android
 
-A secure, decentralized, peer-to-peer messaging app that works over Bluetooth mesh networks. No internet required for mesh chats, no servers, no phone numbers - just pure encrypted communication. Bitchat also supports geohash channels, which use an internet connection to connect you with others in your geographic area.
+A secure, decentralized, peer-to-peer messaging app that works over Bluetooth mesh networks. No internet required for mesh chats, no servers, no phone numbers - just pure encrypted communication. BlueTalk also supports geohash channels, which use an internet connection to connect you with others in your geographic area.
 
 This is the **Android port** of the original [bluetalk iOS app](https://github.com/jackjackbits/bluetalk), maintaining 100% protocol compatibility for cross-platform communication.
 
@@ -215,7 +215,7 @@ bluetalk uses an efficient binary protocol optimized for Bluetooth LE:
 
 ### Core Components
 
-1. **BitchatApplication.kt**: Application-level initialization and dependency injection
+1. **BlueTalkApplication.kt**: Application-level initialization and dependency injection
 2. **MainActivity.kt**: Main activity handling permissions and UI hosting
 3. **ChatViewModel.kt**: MVVM pattern managing app state and business logic
 4. **BluetoothMeshService.kt**: Core BLE mesh networking (central + peripheral roles)

@@ -1,8 +1,8 @@
 package com.bluetalk.android
 
-import com.bluetalk.android.model.BitchatFilePacket
-import com.bluetalk.android.model.BitchatMessage
-import com.bluetalk.android.model.BitchatMessageType
+import com.bluetalk.android.model.BlueTalkFilePacket
+import com.bluetalk.android.model.BlueTalkMessage
+import com.bluetalk.android.model.BlueTalkMessageType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -22,7 +22,7 @@ class FileTransferTest {
     fun `encode and decode file packet with all fields should preserve data`() {
         // Given: Complete file packet
         val contentArray = ByteArray(1024) { (it % 256).toByte() }
-        val originalPacket = BitchatFilePacket(
+        val originalPacket = BlueTalkFilePacket(
             fileName = "test.png",
             mimeType = "image/png",
             fileSize = 1024000,
@@ -31,7 +31,7 @@ class FileTransferTest {
 
         // When: Encode and decode
         val encoded = originalPacket.encode()
-        val decoded = BitchatFilePacket.decode(encoded!!)
+        val decoded = BlueTalkFilePacket.decode(encoded!!)
 
         // Then: Data should be preserved
         assertNotNull(decoded)
@@ -47,7 +47,7 @@ class FileTransferTest {
     @Test
     fun `encode file packet with filename should include filename TLV`() {
         // Given: Packet with filename
-        val packet = BitchatFilePacket(
+        val packet = BlueTalkFilePacket(
             fileName = "myimage.jpg",
             mimeType = "image/jpeg",
             fileSize = 2048,
@@ -82,7 +82,7 @@ class FileTransferTest {
     fun `encode file size should use big endian byte order for file size`() {
         // Given: File with specific size
         val fileSize = 0x12345678L
-        val packet = BitchatFilePacket(
+        val packet = BlueTalkFilePacket(
             fileName = "test.bin",
             mimeType = "application/octet-stream",
             fileSize = fileSize,
@@ -117,7 +117,7 @@ class FileTransferTest {
     @Test
     fun `decode minimal file packet should handle defaults correctly`() {
         // Given: Minimal valid packet (the constructor requires non-null values)
-        val originalPacket = BitchatFilePacket(
+        val originalPacket = BlueTalkFilePacket(
             fileName = "test",
             mimeType = "application/octet-stream",
             fileSize = 32,  // Matches content size
@@ -126,7 +126,7 @@ class FileTransferTest {
 
         // When: Encode and decode
         val encoded = originalPacket.encode()
-        val decoded = BitchatFilePacket.decode(encoded!!)
+        val decoded = BlueTalkFilePacket.decode(encoded!!)
 
         // Then: Data should be preserved completely
         assertNotNull(decoded)
@@ -142,32 +142,32 @@ class FileTransferTest {
     @Test
     fun `replaceFilePathInContent should correctly format content markers for different file types`() {
         // Given: Different file types
-        val imageMessage = BitchatMessage(
+        val imageMessage = BlueTalkMessage(
             id = "test1",
             sender = "alice",
             senderPeerID = "12345678",
             content = "/data/user/0/com.bluetalk.android/files/images/photo.jpg",
-            type = BitchatMessageType.Image,
+            type = BlueTalkMessageType.Image,
             timestamp = Date(System.currentTimeMillis()),
             isPrivate = false
         )
 
-        val audioMessage = BitchatMessage(
+        val audioMessage = BlueTalkMessage(
             id = "test2",
             sender = "bob",
             senderPeerID = "87654321",
             content = "/data/user/0/com.bluetalk.android/files/audio/voice.amr",
-            type = BitchatMessageType.Audio,
+            type = BlueTalkMessageType.Audio,
             timestamp = Date(System.currentTimeMillis()),
             isPrivate = false
         )
 
-        val fileMessage = BitchatMessage(
+        val fileMessage = BlueTalkMessage(
             id = "test3",
             sender = "charlie",
             senderPeerID = "11223344",
             content = "/data/user/0/com.bluetalk.android/files/documents/document.pdf",
-            type = BitchatMessageType.File,
+            type = BlueTalkMessageType.File,
             timestamp = Date(System.currentTimeMillis()),
             isPrivate = false
         )
@@ -191,12 +191,12 @@ class FileTransferTest {
         // The actual function is in a separate utility file as part of the refactoring
 
         // Given: Incoming image message
-        val imageMessage = BitchatMessage(
+        val imageMessage = BlueTalkMessage(
             id = "test1",
             sender = "alice",
             senderPeerID = "1234abcd",
             content = "📷 sent an image", // This would be the result of the utility function
-            type = BitchatMessageType.Image,
+            type = BlueTalkMessageType.Image,
             timestamp = Date(System.currentTimeMillis()),
             isPrivate = true
         )

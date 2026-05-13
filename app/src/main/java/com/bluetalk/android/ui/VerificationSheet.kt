@@ -72,7 +72,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bluetalk.android.R
 import com.bluetalk.android.core.ui.component.button.CloseButton
-import com.bluetalk.android.core.ui.component.sheet.BitchatBottomSheet
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkBottomSheet
 import com.bluetalk.android.services.VerificationService
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -109,7 +109,7 @@ fun VerificationSheet(
         viewModel.buildMyQRString(nickname, npub)
     }
 
-    BitchatBottomSheet(
+    BlueTalkBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismiss,
     ) {

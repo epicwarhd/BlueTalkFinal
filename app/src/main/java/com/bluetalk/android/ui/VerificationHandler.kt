@@ -5,7 +5,7 @@ import com.bluetalk.android.R
 import com.bluetalk.android.favorites.FavoritesPersistenceService
 import com.bluetalk.android.identity.SecureIdentityStateManager
 import com.bluetalk.android.mesh.BluetoothMeshService
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import com.bluetalk.android.noise.NoiseSession
 import com.bluetalk.android.nostr.GeohashAliasRegistry
 import com.bluetalk.android.services.VerificationService
@@ -307,7 +307,7 @@ class VerificationHandler(
     }
 
     private fun addVerificationSystemMessage(peerID: String, text: String) {
-        val msg = BitchatMessage(
+        val msg = BlueTalkMessage(
             sender = "system",
             content = text,
             timestamp = Date(),

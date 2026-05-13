@@ -74,14 +74,14 @@ object PoWMiningTracker {
  */
 @Composable
 fun MessageWithMatrixAnimation(
-    message: com.bluetalk.android.model.BitchatMessage,
-    messages: List<com.bluetalk.android.model.BitchatMessage> = emptyList(),
+    message: com.bluetalk.android.model.BlueTalkMessage,
+    messages: List<com.bluetalk.android.model.BlueTalkMessage> = emptyList(),
     currentUserNickname: String,
     meshService: com.bluetalk.android.mesh.BluetoothMeshService,
     colorScheme: androidx.compose.material3.ColorScheme,
     timeFormatter: java.text.SimpleDateFormat,
     onNicknameClick: ((String) -> Unit)?,
-    onMessageLongPress: ((com.bluetalk.android.model.BitchatMessage) -> Unit)?,
+    onMessageLongPress: ((com.bluetalk.android.model.BlueTalkMessage) -> Unit)?,
     onImageClick: ((String, List<String>, Int) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
@@ -122,7 +122,7 @@ fun MessageWithMatrixAnimation(
  */
 @Composable
 private fun AnimatedMessageDisplay(
-    message: com.bluetalk.android.model.BitchatMessage,
+    message: com.bluetalk.android.model.BlueTalkMessage,
     currentUserNickname: String,
     meshService: com.bluetalk.android.mesh.BluetoothMeshService,
     colorScheme: androidx.compose.material3.ColorScheme,
@@ -239,7 +239,7 @@ private fun AnimatedMessageDisplay(
  * Identical to formatMessageAsAnnotatedString but excludes timestamp and PoW badge
  */
 private fun formatMessageAsAnnotatedStringWithoutTimestamp(
-    message: com.bluetalk.android.model.BitchatMessage,
+    message: com.bluetalk.android.model.BlueTalkMessage,
     currentUserNickname: String,
     meshService: com.bluetalk.android.mesh.BluetoothMeshService,
     colorScheme: androidx.compose.material3.ColorScheme

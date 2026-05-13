@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import com.bluetalk.android.mesh.BluetoothMeshDelegate
 import com.bluetalk.android.mesh.BluetoothMeshService
 import com.bluetalk.android.service.MeshServiceHolder
-import com.bluetalk.android.model.BitchatMessage
-import com.bluetalk.android.model.BitchatMessageType
+import com.bluetalk.android.model.BlueTalkMessage
+import com.bluetalk.android.model.BlueTalkMessageType
 import com.bluetalk.android.nostr.NostrIdentityBridge
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 
 
 import kotlinx.coroutines.launch
@@ -148,16 +148,16 @@ class ChatViewModel(
 
 
 
-    val messages: StateFlow<List<BitchatMessage>> = state.messages
+    val messages: StateFlow<List<BlueTalkMessage>> = state.messages
     val connectedPeers: StateFlow<List<String>> = state.connectedPeers
     val nickname: StateFlow<String> = state.nickname
     val isConnected: StateFlow<Boolean> = state.isConnected
-    val privateChats: StateFlow<Map<String, List<BitchatMessage>>> = state.privateChats
+    val privateChats: StateFlow<Map<String, List<BlueTalkMessage>>> = state.privateChats
     val selectedPrivateChatPeer: StateFlow<String?> = state.selectedPrivateChatPeer
     val unreadPrivateMessages: StateFlow<Set<String>> = state.unreadPrivateMessages
     val joinedChannels: StateFlow<Set<String>> = state.joinedChannels
     val currentChannel: StateFlow<String?> = state.currentChannel
-    val channelMessages: StateFlow<Map<String, List<BitchatMessage>>> = state.channelMessages
+    val channelMessages: StateFlow<Map<String, List<BlueTalkMessage>>> = state.channelMessages
     val unreadChannelMessages: StateFlow<Map<String, Int>> = state.unreadChannelMessages
     val passwordProtectedChannels: StateFlow<Set<String>> = state.passwordProtectedChannels
     val showPasswordPrompt: StateFlow<Boolean> = state.showPasswordPrompt
@@ -539,7 +539,7 @@ class ChatViewModel(
                 geohashViewModel.sendGeohashMessage(content, selectedLocationChannel.channel, meshService.myPeerID, state.getNicknameValue())
             } else {
                 // Send public/channel message via mesh
-                val message = BitchatMessage(
+                val message = BlueTalkMessage(
                     sender = state.getNicknameValue() ?: meshService.myPeerID,
                     content = content,
                     timestamp = Date(),
@@ -860,7 +860,7 @@ class ChatViewModel(
     
     // MARK: - BluetoothMeshDelegate Implementation (delegated)
     
-    override fun didReceiveMessage(message: BitchatMessage) {
+    override fun didReceiveMessage(message: BlueTalkMessage) {
         meshDelegateHandler.didReceiveMessage(message)
     }
     

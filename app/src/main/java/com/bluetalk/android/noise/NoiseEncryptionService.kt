@@ -403,9 +403,9 @@ class NoiseEncryptionService(private val context: Context) {
     // MARK: - Packet Signing/Verification
 
     /**
-     * Sign a BitchatPacket using our Ed25519 signing key
+     * Sign a BlueTalkPacket using our Ed25519 signing key
      */
-    fun signPacket(packet: com.bluetalk.android.protocol.BitchatPacket): com.bluetalk.android.protocol.BitchatPacket? {
+    fun signPacket(packet: com.bluetalk.android.protocol.BlueTalkPacket): com.bluetalk.android.protocol.BlueTalkPacket? {
         // Create canonical packet bytes for signing
         val packetData = packet.toBinaryDataForSigning() ?: return null
         
@@ -417,9 +417,9 @@ class NoiseEncryptionService(private val context: Context) {
     }
 
     /**
-     * Verify a BitchatPacket signature using the provided public key
+     * Verify a BlueTalkPacket signature using the provided public key
      */
-    fun verifyPacketSignature(packet: com.bluetalk.android.protocol.BitchatPacket, publicKey: ByteArray): Boolean {
+    fun verifyPacketSignature(packet: com.bluetalk.android.protocol.BlueTalkPacket, publicKey: ByteArray): Boolean {
         val signature = packet.signature ?: return false
         
         // Create canonical packet bytes for verification (without signature)

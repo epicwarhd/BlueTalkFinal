@@ -2,7 +2,7 @@ package com.bluetalk.android.nostr
 
 import android.app.Application
 import android.util.Log
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import com.bluetalk.android.ui.ChatState
 import com.bluetalk.android.ui.MessageManager
 import kotlinx.coroutines.CoroutineScope
@@ -90,7 +90,7 @@ class GeohashMessageHandler(
 
                 val senderName = repo.displayNameForNostrPubkeyUI(event.pubkey)
                 val hasNonce = try { NostrProofOfWork.hasNonce(event) } catch (_: Exception) { false }
-                val msg = BitchatMessage(
+                val msg = BlueTalkMessage(
                     id = event.id,
                     sender = senderName,
                     content = event.content,

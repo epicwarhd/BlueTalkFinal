@@ -35,9 +35,9 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.stringResource
 import com.bluetalk.android.R
 import androidx.compose.ui.platform.LocalContext
-import com.bluetalk.android.core.ui.component.sheet.BitchatBottomSheet
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTopBar
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTitle
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkBottomSheet
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTopBar
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTitle
 
 @Composable
 fun MeshTopologySection() {
@@ -157,7 +157,7 @@ fun DebugSettingsSheet(
 
     if (!isPresented) return
 
-    BitchatBottomSheet(
+    BlueTalkBottomSheet(
         onDismissRequest = onDismiss,
     ) {
         // Mark debug sheet visible/invisible to gate heavy work
@@ -641,7 +641,7 @@ fun DebugSettingsSheet(
                 item { Spacer(Modifier.height(16.dp)) }
             }
 
-            BitchatSheetTopBar(
+            BlueTalkSheetTopBar(
                 onClose = onDismiss,
                 modifier = Modifier.align(Alignment.TopCenter),
                 backgroundAlpha = topBarAlpha,
@@ -655,7 +655,7 @@ fun DebugSettingsSheet(
                             contentDescription = null,
                             tint = Color(0xFFFF9500)
                         )
-                        BitchatSheetTitle(
+                        BlueTalkSheetTitle(
                             text = stringResource(R.string.debug_tools)
                         )
                     }

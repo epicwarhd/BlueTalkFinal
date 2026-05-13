@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import java.util.Date
 import java.util.concurrent.ConcurrentLinkedQueue
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.util.toHexString
 
 /**
@@ -492,7 +492,7 @@ class DebugSettingsManager private constructor() {
     fun setNicknameResolver(resolver: (String) -> String?) { nicknameResolver = resolver }
     
     // Explicit incoming/outgoing logging to avoid double counting
-    fun logIncoming(packet: BitchatPacket, fromPeerID: String, fromNickname: String?, fromDeviceAddress: String?, myPeerID: String) {
+    fun logIncoming(packet: BlueTalkPacket, fromPeerID: String, fromNickname: String?, fromDeviceAddress: String?, myPeerID: String) {
         val packetType = packet.type.toString()
         val packetVersion = packet.version
         val route = packet.route

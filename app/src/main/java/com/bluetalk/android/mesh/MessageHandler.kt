@@ -1,11 +1,11 @@
 package com.bluetalk.android.mesh
 
 import android.util.Log
-import com.bluetalk.android.model.BitchatMessage
-import com.bluetalk.android.model.BitchatMessageType
+import com.bluetalk.android.model.BlueTalkMessage
+import com.bluetalk.android.model.BlueTalkMessageType
 import com.bluetalk.android.model.IdentityAnnouncement
 import com.bluetalk.android.model.RoutedPacket
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.protocol.MessageType
 import com.bluetalk.android.util.toHexString
 import kotlinx.coroutines.*
@@ -89,8 +89,8 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
                             return
                         }
                         
-                        // Create BitchatMessage - preserve source packet timestamp
-                        val message = BitchatMessage(
+                        // Create BlueTalkMessage - preserve source packet timestamp
+                        val message = BlueTalkMessage(
                             id = privateMessage.messageID,
                             sender = delegate?.getPeerNickname(peerID) ?: "Unknown",
                             content = privateMessage.content,
@@ -113,12 +113,12 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
                 
                 com.bluetalk.android.model.NoisePayloadType.FILE_TRANSFER -> {
                     // Handle encrypted file transfer; generate unique message ID
-                    val file = com.bluetalk.android.model.BitchatFilePacket.decode(noisePayload.data)
+                    val file = com.bluetalk.android.model.BlueTalkFilePacket.decode(noisePayload.data)
                     if (file != null) {
                         Log.d(TAG, "🔓 Decrypted encrypted file from $peerID: name='${file.fileName}', size=${file.fileSize}, mime='${file.mimeType}'")
                         val uniqueMsgId = java.util.UUID.randomUUID().toString().uppercase()
                         val savedPath = com.bluetalk.android.features.file.FileUtils.saveIncomingFile(appContext, file)
-                        val message = BitchatMessage(
+                        val message = BlueTalkMessage(
                             id = uniqueMsgId,
                             sender = delegate?.getPeerNickname(peerID) ?: "Unknown",
                             content = savedPath,
@@ -191,7 +191,7 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
             }
             
             // Create NOISE_ENCRYPTED packet exactly like iOS
-                val packet = BitchatPacket(
+                val packet = BlueTalkPacket(
                     version = 1u,
                     type = MessageType.NOISE_ENCRYPTED.value,
                     senderID = hexStringToByteArray(myPeerID),
@@ -325,7 +325,7 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
                 Log.d(TAG, "Generated handshake response for $peerID (${response.size} bytes)")
                 
                 // Send response using same packet type (simplified iOS approach)
-                val responsePacket = BitchatPacket(
+                val responsePacket = BlueTalkPacket(
                     version = 1u,
                     type = MessageType.NOISE_HANDSHAKE.value,
                     senderID = hexStringToByteArray(myPeerID),
@@ -393,13 +393,13 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
         try {
             // Try file packet first (voice, image, etc.) and log outcome for FILE_TRANSFER
             val isFileTransfer = com.bluetalk.android.protocol.MessageType.fromValue(packet.type) == com.bluetalk.android.protocol.MessageType.FILE_TRANSFER
-            val file = com.bluetalk.android.model.BitchatFilePacket.decode(packet.payload)
+            val file = com.bluetalk.android.model.BlueTalkFilePacket.decode(packet.payload)
             if (file != null) {
                 if (isFileTransfer) {
                     Log.d(TAG, "📥 FILE_TRANSFER decode success (broadcast): name='${file.fileName}', size=${file.fileSize}, mime='${file.mimeType}', from=${peerID.take(8)}")
                 }
                 val savedPath = com.bluetalk.android.features.file.FileUtils.saveIncomingFile(appContext, file)
-                val message = BitchatMessage(
+                val message = BlueTalkMessage(
                     id = java.util.UUID.randomUUID().toString().uppercase(),
                     sender = delegate?.getPeerNickname(peerID) ?: "unknown",
                     content = savedPath,
@@ -415,7 +415,7 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
             }
 
             // Fallback: plain text
-            val message = BitchatMessage(
+            val message = BlueTalkMessage(
                 sender = delegate?.getPeerNickname(peerID) ?: "unknown",
                 content = String(packet.payload, Charsets.UTF_8),
                 senderPeerID = peerID,
@@ -430,7 +430,7 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
     /**
      * Handle (decrypted) private message addressed to us
      */
-    private suspend fun handlePrivateMessage(packet: BitchatPacket, peerID: String) {
+    private suspend fun handlePrivateMessage(packet: BlueTalkPacket, peerID: String) {
         try {
             // Verify signature if present
             if (packet.signature != null && !delegate?.verifySignature(packet, peerID)!!) {
@@ -440,13 +440,13 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
 
             // Try file packet first (voice, image, etc.) and log outcome for FILE_TRANSFER
             val isFileTransfer = com.bluetalk.android.protocol.MessageType.fromValue(packet.type) == com.bluetalk.android.protocol.MessageType.FILE_TRANSFER
-            val file = com.bluetalk.android.model.BitchatFilePacket.decode(packet.payload)
+            val file = com.bluetalk.android.model.BlueTalkFilePacket.decode(packet.payload)
             if (file != null) {
                 if (isFileTransfer) {
                     Log.d(TAG, "📥 FILE_TRANSFER decode success (private): name='${file.fileName}', size=${file.fileSize}, mime='${file.mimeType}', from=${peerID.take(8)}")
                 }
                 val savedPath = com.bluetalk.android.features.file.FileUtils.saveIncomingFile(appContext, file)
-                val message = BitchatMessage(
+                val message = BlueTalkMessage(
                     id = java.util.UUID.randomUUID().toString().uppercase(),
                     sender = delegate?.getPeerNickname(peerID) ?: "unknown",
                     content = savedPath,
@@ -464,7 +464,7 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
             }
 
             // Fallback: plain text
-            val message = BitchatMessage(
+            val message = BlueTalkMessage(
                 sender = delegate?.getPeerNickname(peerID) ?: "unknown",
                 content = String(packet.payload, Charsets.UTF_8),
                 senderPeerID = peerID,
@@ -572,7 +572,7 @@ class MessageHandler(private val myPeerID: String, private val appContext: andro
 
                 // Emit system message via delegate callback
                 val action = if (isFavorite) "favorited" else "unfavorited"
-                val sys = com.bluetalk.android.model.BitchatMessage(
+                val sys = com.bluetalk.android.model.BlueTalkMessage(
                     sender = "system",
                     content = "${peerInfo.nickname} $action you$guidance",
                     timestamp = java.util.Date(),
@@ -601,12 +601,12 @@ interface MessageHandlerDelegate {
     fun updatePeerInfo(peerID: String, nickname: String, noisePublicKey: ByteArray, signingPublicKey: ByteArray, isVerified: Boolean): Boolean
     
     // Packet operations
-    fun sendPacket(packet: BitchatPacket)
+    fun sendPacket(packet: BlueTalkPacket)
     fun relayPacket(routed: RoutedPacket)
     fun getBroadcastRecipient(): ByteArray
     
     // Cryptographic operations
-    fun verifySignature(packet: BitchatPacket, peerID: String): Boolean
+    fun verifySignature(packet: BlueTalkPacket, peerID: String): Boolean
     fun encryptForPeer(data: ByteArray, recipientPeerID: String): ByteArray?
     fun decryptFromPeer(encryptedData: ByteArray, senderPeerID: String): ByteArray?
     fun verifyEd25519Signature(signature: ByteArray, data: ByteArray, publicKey: ByteArray): Boolean
@@ -622,7 +622,7 @@ interface MessageHandlerDelegate {
     fun decryptChannelMessage(encryptedContent: ByteArray, channel: String): String?
 
     // Callbacks
-    fun onMessageReceived(message: BitchatMessage)
+    fun onMessageReceived(message: BlueTalkMessage)
     fun onChannelLeave(channel: String, fromPeer: String)
     fun onDeliveryAckReceived(messageID: String, peerID: String)
     fun onReadReceiptReceived(messageID: String, peerID: String)

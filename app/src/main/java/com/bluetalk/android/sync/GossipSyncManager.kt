@@ -3,7 +3,7 @@ package com.bluetalk.android.sync
 import android.util.Log
 import com.bluetalk.android.mesh.BluetoothPacketBroadcaster
 import com.bluetalk.android.model.RequestSyncPacket
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.protocol.MessageType
 import com.bluetalk.android.protocol.SpecialRecipients
 import kotlinx.coroutines.*
@@ -20,9 +20,9 @@ class GossipSyncManager(
     private val configProvider: ConfigProvider
 ) {
     interface Delegate {
-        fun sendPacket(packet: BitchatPacket)
-        fun sendPacketToPeer(peerID: String, packet: BitchatPacket)
-        fun signPacketForBroadcast(packet: BitchatPacket): BitchatPacket
+        fun sendPacket(packet: BlueTalkPacket)
+        fun sendPacketToPeer(peerID: String, packet: BlueTalkPacket)
+        fun signPacketForBroadcast(packet: BlueTalkPacket): BlueTalkPacket
     }
 
     interface ConfigProvider {
@@ -43,9 +43,9 @@ class GossipSyncManager(
 
     // Stored packets for sync:
     // - broadcast messages: keep up to seenCapacity() most recent, keyed by packetId
-    private val messages = LinkedHashMap<String, BitchatPacket>()
+    private val messages = LinkedHashMap<String, BlueTalkPacket>()
     // - announcements: only keep latest per sender peerID
-    private val latestAnnouncementByPeer = ConcurrentHashMap<String, Pair<String, BitchatPacket>>()
+    private val latestAnnouncementByPeer = ConcurrentHashMap<String, Pair<String, BlueTalkPacket>>()
 
     private var periodicJob: Job? = null
     private var cleanupJob: Job? = null
@@ -93,7 +93,7 @@ class GossipSyncManager(
         }
     }
 
-    fun onPublicPacketSeen(packet: BitchatPacket) {
+    fun onPublicPacketSeen(packet: BlueTalkPacket) {
         // Only ANNOUNCE or broadcast MESSAGE
         val mt = MessageType.fromValue(packet.type)
         val isBroadcastMessage = (mt == MessageType.MESSAGE && (packet.recipientID == null || packet.recipientID.contentEquals(SpecialRecipients.BROADCAST)))
@@ -136,7 +136,7 @@ class GossipSyncManager(
     private fun sendRequestSync() {
         val payload = buildGcsPayload()
 
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.REQUEST_SYNC.value,
             senderID = hexStringToByteArray(myPeerID),
             timestamp = System.currentTimeMillis().toULong(),
@@ -151,7 +151,7 @@ class GossipSyncManager(
     private fun sendRequestSyncToPeer(peerID: String) {
         val payload = buildGcsPayload()
 
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.REQUEST_SYNC.value,
             senderID = hexStringToByteArray(myPeerID),
             recipientID = hexStringToByteArray(peerID),
@@ -230,7 +230,7 @@ class GossipSyncManager(
 
     private fun buildGcsPayload(): ByteArray {
         // Collect candidates: latest announcement per peer + recent broadcast messages
-        val list = ArrayList<BitchatPacket>()
+        val list = ArrayList<BlueTalkPacket>()
         // announcements
         for ((_, pair) in latestAnnouncementByPeer) {
             list.add(pair.second)

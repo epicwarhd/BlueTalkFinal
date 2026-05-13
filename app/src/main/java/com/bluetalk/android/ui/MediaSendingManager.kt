@@ -2,9 +2,9 @@ package com.bluetalk.android.ui
 
 import android.util.Log
 import com.bluetalk.android.mesh.BluetoothMeshService
-import com.bluetalk.android.model.BitchatFilePacket
-import com.bluetalk.android.model.BitchatMessage
-import com.bluetalk.android.model.BitchatMessageType
+import com.bluetalk.android.model.BlueTalkFilePacket
+import com.bluetalk.android.model.BlueTalkMessage
+import com.bluetalk.android.model.BlueTalkMessageType
 import java.util.Date
 import java.security.MessageDigest
 
@@ -47,7 +47,7 @@ class MediaSendingManager(
                 return
             }
 
-            val filePacket = BitchatFilePacket(
+            val filePacket = BlueTalkFilePacket(
                 fileName = file.name,
                 fileSize = file.length(),
                 mimeType = "audio/mp4",
@@ -55,9 +55,9 @@ class MediaSendingManager(
             )
 
             if (toPeerIDOrNull != null) {
-                sendPrivateFile(toPeerIDOrNull, filePacket, filePath, BitchatMessageType.Audio)
+                sendPrivateFile(toPeerIDOrNull, filePacket, filePath, BlueTalkMessageType.Audio)
             } else {
-                sendPublicFile(channelOrNull, filePacket, filePath, BitchatMessageType.Audio)
+                sendPublicFile(channelOrNull, filePacket, filePath, BlueTalkMessageType.Audio)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to send voice note: ${e.message}")
@@ -82,7 +82,7 @@ class MediaSendingManager(
                 return
             }
 
-            val filePacket = BitchatFilePacket(
+            val filePacket = BlueTalkFilePacket(
                 fileName = file.name,
                 fileSize = file.length(),
                 mimeType = "image/jpeg",
@@ -90,9 +90,9 @@ class MediaSendingManager(
             )
 
             if (toPeerIDOrNull != null) {
-                sendPrivateFile(toPeerIDOrNull, filePacket, filePath, BitchatMessageType.Image)
+                sendPrivateFile(toPeerIDOrNull, filePacket, filePath, BlueTalkMessageType.Image)
             } else {
-                sendPublicFile(channelOrNull, filePacket, filePath, BitchatMessageType.Image)
+                sendPublicFile(channelOrNull, filePacket, filePath, BlueTalkMessageType.Image)
             }
         } catch (e: Exception) {
             Log.e(TAG, "❌ CRITICAL: Image send failed completely", e)
@@ -138,7 +138,7 @@ class MediaSendingManager(
             }
             Log.d(TAG, "📝 Original filename: $originalName")
 
-            val filePacket = BitchatFilePacket(
+            val filePacket = BlueTalkFilePacket(
                 fileName = originalName,
                 fileSize = file.length(),
                 mimeType = mimeType,
@@ -147,9 +147,9 @@ class MediaSendingManager(
             Log.d(TAG, "📦 Created file packet successfully")
 
             val messageType = when {
-                mimeType.lowercase().startsWith("image/") -> BitchatMessageType.Image
-                mimeType.lowercase().startsWith("audio/") -> BitchatMessageType.Audio
-                else -> BitchatMessageType.File
+                mimeType.lowercase().startsWith("image/") -> BlueTalkMessageType.Image
+                mimeType.lowercase().startsWith("audio/") -> BlueTalkMessageType.Audio
+                else -> BlueTalkMessageType.File
             }
 
             if (toPeerIDOrNull != null) {
@@ -170,9 +170,9 @@ class MediaSendingManager(
      */
     private fun sendPrivateFile(
         toPeerID: String,
-        filePacket: BitchatFilePacket,
+        filePacket: BlueTalkFilePacket,
         filePath: String,
-        messageType: BitchatMessageType
+        messageType: BlueTalkMessageType
     ) {
         val payload = filePacket.encode()
         if (payload == null) {
@@ -186,7 +186,7 @@ class MediaSendingManager(
 
         Log.d(TAG, "📤 FILE_TRANSFER send (private): name='${filePacket.fileName}', size=${filePacket.fileSize}, mime='${filePacket.mimeType}', sha256=$contentHash, to=${toPeerID.take(8)} transferId=${transferId.take(16)}…")
 
-        val msg = BitchatMessage(
+        val msg = BlueTalkMessage(
             id = java.util.UUID.randomUUID().toString().uppercase(), // Generate unique ID for each message
             sender = state.getNicknameValue() ?: "me",
             content = filePath,
@@ -221,9 +221,9 @@ class MediaSendingManager(
      */
     private fun sendPublicFile(
         channelOrNull: String?,
-        filePacket: BitchatFilePacket,
+        filePacket: BlueTalkFilePacket,
         filePath: String,
-        messageType: BitchatMessageType
+        messageType: BlueTalkMessageType
     ) {
         val payload = filePacket.encode()
         if (payload == null) {
@@ -237,7 +237,7 @@ class MediaSendingManager(
         
         Log.d(TAG, "📤 FILE_TRANSFER send (broadcast): name='${filePacket.fileName}', size=${filePacket.fileSize}, mime='${filePacket.mimeType}', sha256=$contentHash, transferId=${transferId.take(16)}…")
 
-        val message = BitchatMessage(
+        val message = BlueTalkMessage(
             id = java.util.UUID.randomUUID().toString().uppercase(), // Generate unique ID for each message
             sender = state.getNicknameValue() ?: meshService.myPeerID,
             content = filePath,

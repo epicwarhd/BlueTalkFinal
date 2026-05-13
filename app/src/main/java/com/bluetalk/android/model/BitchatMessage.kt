@@ -8,7 +8,7 @@ import java.nio.ByteOrder
 import java.util.*
 
 @Parcelize
-enum class BitchatMessageType : Parcelable {
+enum class BlueTalkMessageType : Parcelable {
     Message,
     Audio,
     Image,
@@ -50,14 +50,14 @@ sealed class DeliveryStatus : Parcelable {
 }
 
 /**
- * BitchatMessage - 100% compatible with iOS version
+ * BlueTalkMessage - 100% compatible with iOS version
  */
 @Parcelize
-data class BitchatMessage(
+data class BlueTalkMessage(
     val id: String = UUID.randomUUID().toString().uppercase(),
     val sender: String,
     val content: String,
-    val type: BitchatMessageType = BitchatMessageType.Message,
+    val type: BlueTalkMessageType = BlueTalkMessageType.Message,
     val timestamp: Date,
     val isRelay: Boolean = false,
     val originalSender: String? = null,
@@ -175,7 +175,7 @@ data class BitchatMessage(
         /**
          * Parse message from binary payload - exactly same logic as iOS version
          */
-        fun fromBinaryPayload(data: ByteArray): BitchatMessage? {
+        fun fromBinaryPayload(data: ByteArray): BlueTalkMessage? {
             try {
                 if (data.size < 13) return null
 
@@ -284,11 +284,11 @@ data class BitchatMessage(
                     } else null
                 } else null
 
-                return BitchatMessage(
+                return BlueTalkMessage(
                     id = id,
                     sender = sender,
                     content = content,
-                    type = BitchatMessageType.Message,
+                    type = BlueTalkMessageType.Message,
                     timestamp = timestamp,
                     isRelay = isRelay,
                     originalSender = originalSender,
@@ -311,7 +311,7 @@ data class BitchatMessage(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as BitchatMessage
+        other as BlueTalkMessage
 
         if (id != other.id) return false
         if (sender != other.sender) return false

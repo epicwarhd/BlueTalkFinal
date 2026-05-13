@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bluetalk.android.R
 import com.bluetalk.android.core.ui.component.button.CloseButton
-import com.bluetalk.android.core.ui.component.sheet.BitchatBottomSheet
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkBottomSheet
 
 private data class SecurityStatusInfo(
     val text: String,
@@ -74,7 +74,7 @@ fun SecurityVerificationSheet(
     val boxColor = if (isDark) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.06f)
     val peerHexRegex = remember { Regex("^[0-9a-fA-F]{16}$") }
 
-    BitchatBottomSheet(
+    BlueTalkBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismiss,
     ) {

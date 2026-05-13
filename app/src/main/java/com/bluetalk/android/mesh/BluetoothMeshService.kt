@@ -3,13 +3,13 @@ package com.bluetalk.android.mesh
 import android.content.Context
 import android.util.Log
 import com.bluetalk.android.crypto.EncryptionService
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import com.bluetalk.android.protocol.MessagePadding
 import com.bluetalk.android.model.RoutedPacket
 import com.bluetalk.android.model.IdentityAnnouncement
 import com.bluetalk.android.model.NoisePayload
 import com.bluetalk.android.model.NoisePayloadType
-import com.bluetalk.android.protocol.BitchatPacket
+import com.bluetalk.android.protocol.BlueTalkPacket
 import com.bluetalk.android.protocol.MessageType
 import com.bluetalk.android.protocol.SpecialRecipients
 import com.bluetalk.android.model.RequestSyncPacket
@@ -101,13 +101,13 @@ class BluetoothMeshService(private val context: Context) {
 
         // Wire sync manager delegate
         gossipSyncManager.delegate = object : GossipSyncManager.Delegate {
-            override fun sendPacket(packet: BitchatPacket) {
+            override fun sendPacket(packet: BlueTalkPacket) {
                 connectionManager.broadcastPacket(RoutedPacket(packet))
             }
-            override fun sendPacketToPeer(peerID: String, packet: BitchatPacket) {
+            override fun sendPacketToPeer(peerID: String, packet: BlueTalkPacket) {
                 connectionManager.sendPacketToPeer(peerID, packet)
             }
-            override fun signPacketForBroadcast(packet: BitchatPacket): BitchatPacket {
+            override fun signPacketForBroadcast(packet: BlueTalkPacket): BlueTalkPacket {
                 return signPacketBeforeBroadcast(packet)
             }
         }
@@ -210,7 +210,7 @@ class BluetoothMeshService(private val context: Context) {
             
             override fun sendHandshakeResponse(peerID: String, response: ByteArray) {
                 // Send Noise handshake response
-                val responsePacket = BitchatPacket(
+                val responsePacket = BlueTalkPacket(
                     version = 1u,
                     type = MessageType.NOISE_HANDSHAKE.value,
                     senderID = hexStringToByteArray(myPeerID),
@@ -240,7 +240,7 @@ class BluetoothMeshService(private val context: Context) {
                 return peerManager.isPeerActive(peerID)
             }
             
-            override fun sendPacket(packet: BitchatPacket) {
+            override fun sendPacket(packet: BlueTalkPacket) {
                 connectionManager.broadcastPacket(RoutedPacket(packet))
             }
         }
@@ -281,7 +281,7 @@ class BluetoothMeshService(private val context: Context) {
             }
             
             // Packet operations
-            override fun sendPacket(packet: BitchatPacket) {
+            override fun sendPacket(packet: BlueTalkPacket) {
                 // Sign the packet before broadcasting
                 val signedPacket = signPacketBeforeBroadcast(packet)
                 connectionManager.broadcastPacket(RoutedPacket(signedPacket))
@@ -296,7 +296,7 @@ class BluetoothMeshService(private val context: Context) {
             }
             
             // Cryptographic operations
-            override fun verifySignature(packet: BitchatPacket, peerID: String): Boolean {
+            override fun verifySignature(packet: BlueTalkPacket, peerID: String): Boolean {
                 return securityManager.verifySignature(packet, peerID)
             }
             
@@ -323,7 +323,7 @@ class BluetoothMeshService(private val context: Context) {
                     val handshakeData = encryptionService.initiateHandshake(peerID)
 
                     if (handshakeData != null) {
-                        val packet = BitchatPacket(
+                        val packet = BlueTalkPacket(
                             version = 1u,
                             type = MessageType.NOISE_HANDSHAKE.value,
                             senderID = hexStringToByteArray(myPeerID),
@@ -386,7 +386,7 @@ class BluetoothMeshService(private val context: Context) {
             }
             
             // Callbacks
-            override fun onMessageReceived(message: BitchatMessage) {
+            override fun onMessageReceived(message: BlueTalkMessage) {
                 // Always reflect into process-wide store so UI can hydrate after recreation
                 try {
                     when {
@@ -442,7 +442,7 @@ class BluetoothMeshService(private val context: Context) {
         
         // PacketProcessor delegates
         packetProcessor.delegate = object : PacketProcessorDelegate {
-            override fun validatePacketSecurity(packet: BitchatPacket, peerID: String): Boolean {
+            override fun validatePacketSecurity(packet: BlueTalkPacket, peerID: String): Boolean {
                 return securityManager.validatePacket(packet, peerID)
             }
             
@@ -518,7 +518,7 @@ class BluetoothMeshService(private val context: Context) {
                 serviceScope.launch { messageHandler.handleLeave(routed) }
             }
             
-            override fun handleFragment(packet: BitchatPacket): BitchatPacket? {
+            override fun handleFragment(packet: BlueTalkPacket): BlueTalkPacket? {
                 // Track broadcast fragments for gossip sync
                 try {
                     val isBroadcast = (packet.recipientID == null || packet.recipientID.contentEquals(SpecialRecipients.BROADCAST))
@@ -555,7 +555,7 @@ class BluetoothMeshService(private val context: Context) {
         
         // BluetoothConnectionManager delegates
         connectionManager.delegate = object : BluetoothConnectionManagerDelegate {
-        override fun onPacketReceived(packet: BitchatPacket, peerID: String, device: android.bluetooth.BluetoothDevice?) {
+        override fun onPacketReceived(packet: BlueTalkPacket, peerID: String, device: android.bluetooth.BluetoothDevice?) {
             // Log incoming for debug graphs (do not double-count anywhere else)
             try {
                 com.bluetalk.android.ui.debug.DebugSettingsManager.getInstance().logIncoming(
@@ -704,7 +704,7 @@ class BluetoothMeshService(private val context: Context) {
         if (content.isEmpty()) return
         
         serviceScope.launch {
-            val packet = BitchatPacket(
+            val packet = BlueTalkPacket(
                 version = 1u,
                 type = MessageType.MESSAGE.value,
                 senderID = hexStringToByteArray(myPeerID),
@@ -726,7 +726,7 @@ class BluetoothMeshService(private val context: Context) {
     /**
      * Send a file over mesh as a broadcast MESSAGE (public mesh timeline/channels).
      */
-    fun sendFileBroadcast(file: com.bluetalk.android.model.BitchatFilePacket) {
+    fun sendFileBroadcast(file: com.bluetalk.android.model.BlueTalkFilePacket) {
         try {
             Log.d(TAG, "📤 sendFileBroadcast: name=${file.fileName}, size=${file.fileSize}")
             val payload = file.encode()
@@ -736,7 +736,7 @@ class BluetoothMeshService(private val context: Context) {
             }
             Log.d(TAG, "📦 Encoded payload: ${payload.size} bytes")
         serviceScope.launch {
-            val packet = BitchatPacket(
+            val packet = BlueTalkPacket(
                 version = 2u,  // FILE_TRANSFER uses v2 for 4-byte payload length to support large files
                 type = MessageType.FILE_TRANSFER.value,
                 senderID = hexStringToByteArray(myPeerID),
@@ -761,7 +761,7 @@ class BluetoothMeshService(private val context: Context) {
     /**
      * Send a file as an encrypted private message using Noise protocol
      */
-    fun sendFilePrivate(recipientPeerID: String, file: com.bluetalk.android.model.BitchatFilePacket) {
+    fun sendFilePrivate(recipientPeerID: String, file: com.bluetalk.android.model.BlueTalkFilePacket) {
         try {
             Log.d(TAG, "📤 sendFilePrivate (ENCRYPTED): to=$recipientPeerID, name=${file.fileName}, size=${file.fileSize}")
             
@@ -792,7 +792,7 @@ class BluetoothMeshService(private val context: Context) {
                         Log.d(TAG, "🔐 Encrypted file payload: ${encrypted.size} bytes")
                         
                         // Create NOISE_ENCRYPTED packet (not FILE_TRANSFER!)
-                        val packet = BitchatPacket(
+                        val packet = BlueTalkPacket(
                             version = 1u,
                             type = MessageType.NOISE_ENCRYPTED.value,
                             senderID = hexStringToByteArray(myPeerID),
@@ -874,7 +874,7 @@ class BluetoothMeshService(private val context: Context) {
                     val encrypted = encryptionService.encrypt(messagePayload.encode(), recipientPeerID)
                     
                     // Create NOISE_ENCRYPTED packet exactly like iOS
-                    val packet = BitchatPacket(
+                    val packet = BlueTalkPacket(
                         version = 1u,
                         type = MessageType.NOISE_ENCRYPTED.value,
                         senderID = hexStringToByteArray(myPeerID),
@@ -945,7 +945,7 @@ class BluetoothMeshService(private val context: Context) {
                 val encrypted = encryptionService.encrypt(readReceiptPayload.encode(), recipientPeerID)
                 
                 // Create NOISE_ENCRYPTED packet exactly like iOS
-                val packet = BitchatPacket(
+                val packet = BlueTalkPacket(
                     version = 1u,
                     type = MessageType.NOISE_ENCRYPTED.value,
                     senderID = hexStringToByteArray(myPeerID),
@@ -994,7 +994,7 @@ class BluetoothMeshService(private val context: Context) {
         serviceScope.launch {
             try {
                 val encrypted = encryptionService.encrypt(payload.encode(), recipientPeerID)
-                val packet = BitchatPacket(
+                val packet = BlueTalkPacket(
                     version = 1u,
                     type = MessageType.NOISE_ENCRYPTED.value,
                     senderID = hexStringToByteArray(myPeerID),
@@ -1058,7 +1058,7 @@ class BluetoothMeshService(private val context: Context) {
                 } catch (_: Exception) { }
             } catch (_: Exception) { }
             
-            val announcePacket = BitchatPacket(
+            val announcePacket = BlueTalkPacket(
                 type = MessageType.ANNOUNCE.value,
                 ttl = MAX_TTL,
                 senderID = myPeerID,
@@ -1121,7 +1121,7 @@ class BluetoothMeshService(private val context: Context) {
             } catch (_: Exception) { }
         } catch (_: Exception) { }
         
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.ANNOUNCE.value,
             ttl = MAX_TTL,
             senderID = myPeerID,
@@ -1159,7 +1159,7 @@ class BluetoothMeshService(private val context: Context) {
      * Send leave announcement
      */
     private fun sendLeaveAnnouncement() {
-        val packet = BitchatPacket(
+        val packet = BlueTalkPacket(
             type = MessageType.LEAVE.value,
             ttl = MAX_TTL,
             senderID = myPeerID,
@@ -1335,7 +1335,7 @@ class BluetoothMeshService(private val context: Context) {
     /**
      * Sign packet before broadcasting using our signing private key
      */
-    private fun signPacketBeforeBroadcast(packet: BitchatPacket): BitchatPacket {
+    private fun signPacketBeforeBroadcast(packet: BlueTalkPacket): BlueTalkPacket {
         return try {
             // Optionally compute and attach a source route for addressed packets
             val withRoute = try {
@@ -1418,7 +1418,7 @@ class BluetoothMeshService(private val context: Context) {
  * Delegate interface for mesh service callbacks (maintains exact same interface)
  */
 interface BluetoothMeshDelegate {
-    fun didReceiveMessage(message: BitchatMessage)
+    fun didReceiveMessage(message: BlueTalkMessage)
     fun didUpdatePeerList(peers: List<String>)
     fun didReceiveChannelLeave(channel: String, fromPeer: String)
     fun didReceiveDeliveryAck(messageID: String, recipientPeerID: String)

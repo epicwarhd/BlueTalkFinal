@@ -15,8 +15,8 @@ import androidx.compose.ui.res.stringResource
 import com.bluetalk.android.R
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
-import com.bluetalk.android.core.ui.component.sheet.BitchatBottomSheet
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkBottomSheet
+import com.bluetalk.android.model.BlueTalkMessage
 
 /**
  * User Action Sheet for selecting actions on a specific user (slap, hug, block)
@@ -28,7 +28,7 @@ fun ChatUserSheet(
     isPresented: Boolean,
     onDismiss: () -> Unit,
     targetNickname: String,
-    selectedMessage: BitchatMessage? = null,
+    selectedMessage: BlueTalkMessage? = null,
     viewModel: ChatViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -45,7 +45,7 @@ fun ChatUserSheet(
     val standardGrey = if (isDark) Color(0xFF8E8E93) else Color(0xFF6D6D70) // iOS grey
     
     if (isPresented) {
-        BitchatBottomSheet(
+        BlueTalkBottomSheet(
             onDismissRequest = onDismiss,
             modifier = modifier
         ) {

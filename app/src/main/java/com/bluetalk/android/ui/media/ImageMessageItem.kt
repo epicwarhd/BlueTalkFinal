@@ -28,23 +28,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.text.font.FontFamily
 import com.bluetalk.android.mesh.BluetoothMeshService
-import com.bluetalk.android.model.BitchatMessage
-import com.bluetalk.android.model.BitchatMessageType
+import com.bluetalk.android.model.BlueTalkMessage
+import com.bluetalk.android.model.BlueTalkMessageType
 import androidx.compose.material3.ColorScheme
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun ImageMessageItem(
-    message: BitchatMessage,
-    messages: List<BitchatMessage>,
+    message: BlueTalkMessage,
+    messages: List<BlueTalkMessage>,
     currentUserNickname: String,
     meshService: BluetoothMeshService,
     colorScheme: ColorScheme,
     timeFormatter: SimpleDateFormat,
     onNicknameClick: ((String) -> Unit)?,
-    onMessageLongPress: ((BitchatMessage) -> Unit)?,
-    onCancelTransfer: ((BitchatMessage) -> Unit)?,
+    onMessageLongPress: ((BlueTalkMessage) -> Unit)?,
+    onCancelTransfer: ((BlueTalkMessage) -> Unit)?,
     onImageClick: ((String, List<String>, Int) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
@@ -82,7 +82,7 @@ fun ImageMessageItem(
 
         // Collect all image paths from messages for swipe navigation
         val imagePaths = remember(messages) {
-            messages.filter { it.type == BitchatMessageType.Image }
+            messages.filter { it.type == BlueTalkMessageType.Image }
                 .map { it.content.trim() }
         }
 

@@ -1,9 +1,9 @@
-# Bitchat Android - Agent Guide
+# BlueTalk Android - Agent Guide
 
-This document provides context, architectural insights, and development standards for AI agents working on the Bitchat Android codebase.
+This document provides context, architectural insights, and development standards for AI agents working on the BlueTalk Android codebase.
 
 ## 1. Project Overview
-**Bitchat** is a decentralized, off-grid communication application focused on privacy and censorship resistance. It utilizes mesh networking (primarily Bluetooth LE and Tor/Arti) to enable peer-to-peer messaging without centralized servers.
+**BlueTalk** is a decentralized, off-grid communication application focused on privacy and censorship resistance. It utilizes mesh networking (primarily Bluetooth LE and Tor/Arti) to enable peer-to-peer messaging without centralized servers.
 
 **Key Technologies:**
 - **Language:** Kotlin (JVM Target 1.8)

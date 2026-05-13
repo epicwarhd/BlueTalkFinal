@@ -33,10 +33,10 @@ class NotificationManager(
 
     companion object {
         private const val TAG = "NotificationManager"
-        private const val CHANNEL_ID = "bitchat_dm_notifications"
-        private const val GEOHASH_CHANNEL_ID = "bitchat_geohash_notifications"
-        private const val GROUP_KEY_DM = "bitchat_dm_group"
-        private const val GROUP_KEY_GEOHASH = "bitchat_geohash_group"
+        private const val CHANNEL_ID = "bluetalk_dm_notifications"
+        private const val GEOHASH_CHANNEL_ID = "bluetalk_geohash_notifications"
+        private const val GROUP_KEY_DM = "bluetalk_dm_group"
+        private const val GROUP_KEY_GEOHASH = "bluetalk_geohash_group"
         private const val NOTIFICATION_REQUEST_CODE = 1000
         private const val GEOHASH_NOTIFICATION_REQUEST_CODE = 2000
         private const val SUMMARY_NOTIFICATION_ID = 999

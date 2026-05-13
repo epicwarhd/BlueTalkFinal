@@ -38,9 +38,9 @@ import com.bluetalk.android.ui.theme.BASE_FONT_SIZE
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bluetalk.android.R
-import com.bluetalk.android.core.ui.component.sheet.BitchatBottomSheet
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTopBar
-import com.bluetalk.android.core.ui.component.sheet.BitchatSheetTitle
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkBottomSheet
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTopBar
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkSheetTitle
 
 /**
  * Location Channels Sheet for selecting geohash-based location channels
@@ -116,7 +116,7 @@ fun LocationChannelsSheet(
     val standardBlue = Color(0xFF007AFF) // iOS blue
 
     if (isPresented) {
-        BitchatBottomSheet(
+        BlueTalkBottomSheet(
             modifier = modifier,
             onDismissRequest = onDismiss,
             sheetState = sheetState,
@@ -508,11 +508,11 @@ fun LocationChannelsSheet(
                 }
 
                 // TopBar (animated)
-                BitchatSheetTopBar(
+                BlueTalkSheetTopBar(
                     onClose = onDismiss,
                     modifier = modifier.align(Alignment.TopCenter),
                     title = {
-                        BitchatSheetTitle(
+                        BlueTalkSheetTitle(
                             text = stringResource(R.string.location_channels_title)
                         )
                     }

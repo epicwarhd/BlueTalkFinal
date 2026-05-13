@@ -31,7 +31,7 @@ import com.bluetalk.android.nostr.PoWPreferenceManager
 import androidx.compose.ui.res.stringResource
 import com.bluetalk.android.R
 import com.bluetalk.android.core.ui.component.button.CloseButton
-import com.bluetalk.android.core.ui.component.sheet.BitchatBottomSheet
+import com.bluetalk.android.core.ui.component.sheet.BlueTalkBottomSheet
 import com.bluetalk.android.net.TorMode
 import com.bluetalk.android.net.TorPreferenceManager
 import com.bluetalk.android.net.ArtiTorManager
@@ -228,7 +228,7 @@ fun AboutSheet(
     val isDark = colorScheme.background.red + colorScheme.background.green + colorScheme.background.blue < 1.5f
     
     if (isPresented) {
-        BitchatBottomSheet(
+        BlueTalkBottomSheet(
             modifier = modifier,
             onDismissRequest = onDismiss,
         ) {

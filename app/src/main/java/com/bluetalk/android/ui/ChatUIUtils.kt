@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.bluetalk.android.model.BitchatMessage
+import com.bluetalk.android.model.BlueTalkMessage
 import com.bluetalk.android.mesh.BluetoothMeshService
 import androidx.compose.material3.ColorScheme
 import com.bluetalk.android.ui.theme.BASE_FONT_SIZE
@@ -40,7 +40,7 @@ fun getRSSIColor(rssi: Int): Color {
  * Timestamp at END, peer colors, hashtag suffix handling
  */
 fun formatMessageAsAnnotatedString(
-    message: BitchatMessage,
+    message: BlueTalkMessage,
     currentUserNickname: String,
     meshService: BluetoothMeshService,
     colorScheme: ColorScheme,
@@ -160,7 +160,7 @@ fun formatMessageAsAnnotatedString(
  * Build only the nickname + timestamp header line for a message, matching styles of normal messages.
  */
 fun formatMessageHeaderAnnotatedString(
-    message: BitchatMessage,
+    message: BlueTalkMessage,
     currentUserNickname: String,
     meshService: BluetoothMeshService,
     colorScheme: ColorScheme,
@@ -259,7 +259,7 @@ fun formatMessageHeaderAnnotatedString(
  * iOS-style peer color assignment using djb2 hash algorithm
  * Avoids orange (~30°) reserved for self messages
  */
-fun getPeerColor(message: BitchatMessage, isDark: Boolean): Color {
+fun getPeerColor(message: BlueTalkMessage, isDark: Boolean): Color {
     // Create seed from peer identifier (prioritizing stable keys)
     val seed = when {
         message.senderPeerID?.startsWith("nostr:") == true || message.senderPeerID?.startsWith("nostr_") == true -> {
