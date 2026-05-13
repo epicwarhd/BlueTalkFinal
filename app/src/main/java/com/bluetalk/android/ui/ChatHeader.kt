@@ -48,9 +48,9 @@ fun TorStatusDot(
     
     if (torStatus.mode != com.bluetalk.android.net.TorMode.OFF) {
         val dotColor = when {
-            torStatus.running && torStatus.bootstrapPercent < 100 -> Color(0xFFFF9500) // Orange - bootstrapping
-            torStatus.running && torStatus.bootstrapPercent >= 100 -> Color(0xFF00C851) // Green - connected
-            else -> Color.Red // Red - error/disconnected
+            torStatus.running && torStatus.bootstrapPercent < 100 -> Color(0xFF00B4D8) // Sky Blue - bootstrapping
+            torStatus.running && torStatus.bootstrapPercent >= 100 -> Color(0xFF00B2CA) // Ocean Teal - connected
+            else -> Color(0xFFFF5252) // Soft Red - error/disconnected
         }
         Canvas(
             modifier = modifier
@@ -70,6 +70,7 @@ fun NoiseSessionIcon(
     sessionState: String?,
     modifier: Modifier = Modifier
 ) {
+    val colorScheme = MaterialTheme.colorScheme
     val (icon, color, contentDescription) = when (sessionState) {
         "uninitialized" -> Triple(
             Icons.Outlined.NoEncryption,
@@ -83,13 +84,13 @@ fun NoiseSessionIcon(
         )
         "established" -> Triple(
             Icons.Filled.Lock,
-            Color(0xFFFF9500), // Orange - secure
+            colorScheme.primary, // Secure in primary color
             stringResource(R.string.cd_encrypted)
         )
         else -> { // "failed" or any other state
             Triple(
                 Icons.Outlined.Warning,
-                Color(0xFFFF4444), // Red - error
+                Color(0xFFFF5252), // Soft Red
                 stringResource(R.string.cd_handshake_failed)
             )
         }
@@ -132,8 +133,7 @@ fun NicknameEditor(
             value = value,
             onValueChange = onValueChange,
             textStyle = MaterialTheme.typography.bodyMedium.copy(
-                color = colorScheme.primary,
-                fontFamily = FontFamily.Monospace
+                color = colorScheme.primary
             ),
             cursorBrush = SolidColor(colorScheme.primary),
             singleLine = true,
@@ -168,15 +168,15 @@ fun PeerCounter(
         is com.bluetalk.android.geohash.ChannelID.Location -> {
             // Geohash channel: show geohash participants
             val count = geohashPeople.size
-            val green = Color(0xFF00C851) // Standard green
-            Pair(count, if (count > 0) green else Color.Gray)
+            val accentColor = colorScheme.primary
+            Pair(count, if (count > 0) accentColor else Color.Gray)
         }
         is com.bluetalk.android.geohash.ChannelID.Mesh,
         null -> {
             // Mesh channel: show Bluetooth-connected peers (excluding self)
             val count = connectedPeers.size
-            val meshBlue = Color(0xFF007AFF) // iOS-style blue for mesh
-            Pair(count, if (isConnected && count > 0) meshBlue else Color.Gray)
+            val secondaryColor = colorScheme.secondary
+            Pair(count, if (isConnected && count > 0) secondaryColor else Color.Gray)
         }
     }
     
@@ -207,7 +207,7 @@ fun PeerCounter(
             Text(
                 text = stringResource(R.string.channel_count_prefix) + "${joinedChannels.size}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (isConnected) Color(0xFF00C851) else Color.Red,
+                color = if (isConnected) colorScheme.primary else Color(0xFFFF5252),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -298,11 +298,11 @@ private fun ChannelHeader(
             }
         }
         
-        // Title - perfectly centered regardless of other elements
+        // Title - perfectly centered
         Text(
             text = stringResource(R.string.chat_channel_prefix, channel),
             style = MaterialTheme.typography.titleMedium,
-            color = Color(0xFFFF9500), // Orange to match input field
+            color = colorScheme.primary,
             modifier = Modifier
                 .align(Alignment.Center)
                 .clickable { onSidebarClick() }
@@ -382,14 +382,13 @@ private fun MainHeader(
 
             // Unread private messages badge (click to open most recent DM)
             if (hasUnreadPrivateMessages.isNotEmpty()) {
-                // Render icon directly to avoid symbol resolution issues
                 Icon(
                     imageVector = Icons.Filled.Email,
                     contentDescription = stringResource(R.string.cd_unread_private_messages),
                     modifier = Modifier
                         .size(16.dp)
                         .clickable { viewModel.openLatestUnreadPrivateChat() },
-                    tint = Color(0xFFFF9500)
+                    tint = colorScheme.primary
                 )
             }
 
@@ -414,10 +413,10 @@ private fun MainHeader(
                             .clickable { bookmarksStore.toggle(currentGeohash) },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
+                    Icon(
                             imageVector = if (isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                             contentDescription = stringResource(R.string.cd_toggle_bookmark),
-                            tint = if (isBookmarked) Color(0xFF00C851) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                            tint = if (isBookmarked) colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -469,13 +468,13 @@ private fun LocationChannelsButton(
     
     val (badgeText, badgeColor) = when (selectedChannel) {
         is com.bluetalk.android.geohash.ChannelID.Mesh -> {
-            "#mesh" to Color(0xFF007AFF) // iOS blue for mesh
+            "#mesh" to colorScheme.secondary
         }
         is com.bluetalk.android.geohash.ChannelID.Location -> {
             val geohash = (selectedChannel as com.bluetalk.android.geohash.ChannelID.Location).channel.geohash
-            "#$geohash" to Color(0xFF00C851) // Green for location
+            "#$geohash" to colorScheme.primary
         }
-        null -> "#mesh" to Color(0xFF007AFF) // Default to mesh
+        null -> "#mesh" to colorScheme.secondary
     }
     
     Button(
@@ -489,9 +488,7 @@ private fun LocationChannelsButton(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = badgeText,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontFamily = FontFamily.Monospace
-                ),
+                style = MaterialTheme.typography.bodyMedium,
                 color = badgeColor,
                 maxLines = 1
             )

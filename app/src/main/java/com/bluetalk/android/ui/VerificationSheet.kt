@@ -98,8 +98,8 @@ fun VerificationSheet(
 ) {
     if (!isPresented) return
 
-    val isDark = isSystemInDarkTheme()
-    val accent = if (isDark) Color.Green else Color(0xFF008000)
+    val colorScheme = MaterialTheme.colorScheme
+    val accent = colorScheme.primary
     
     var selectedTab by remember { mutableStateOf(0) } // 0 = My Code, 1 = Scan
     val nickname by viewModel.nickname.collectAsStateWithLifecycle()
@@ -144,8 +144,7 @@ fun VerificationSheet(
                     text = {
                         Text(
                             text = "My QR",
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
                 )
@@ -155,8 +154,7 @@ fun VerificationSheet(
                     text = {
                         Text(
                             text = "Scan",
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
                 )
@@ -208,8 +206,7 @@ fun VerificationSheet(
                     ) {
                         Text(
                             text = stringResource(R.string.verify_remove),
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 12.sp
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                 }
@@ -231,8 +228,7 @@ private fun VerificationHeader(
     ) {
         Text(
             text = stringResource(R.string.verify_title).uppercase(),
-            fontSize = 14.sp,
-            fontFamily = FontFamily.Monospace,
+            style = MaterialTheme.typography.labelLarge,
             color = accent
         )
         CloseButton(onClick = onClose)
@@ -292,11 +288,9 @@ private fun MyQrTabContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // User Nickname
         Text(
             text = nickname,
             style = MaterialTheme.typography.headlineSmall,
-            fontFamily = FontFamily.Monospace,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
@@ -307,7 +301,6 @@ private fun MyQrTabContent(
         Text(
             text = stringResource(R.string.app_name).lowercase(),
             style = MaterialTheme.typography.bodyMedium,
-            fontFamily = FontFamily.Monospace,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             textAlign = TextAlign.Center
         )
@@ -355,8 +348,7 @@ private fun ScanTabContent(
                 Text(
                     text = stringResource(R.string.verify_scan_prompt_friend),
                     color = Color.White,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 32.dp)

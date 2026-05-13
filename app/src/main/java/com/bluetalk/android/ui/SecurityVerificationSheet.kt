@@ -69,9 +69,9 @@ fun SecurityVerificationSheet(
     val verifiedFingerprints by viewModel.verifiedFingerprints.collectAsStateWithLifecycle()
     val peerSessionStates by viewModel.peerSessionStates.collectAsStateWithLifecycle()
 
-    val isDark = isSystemInDarkTheme()
-    val accent = if (isDark) Color.Green else Color(0xFF008000)
-    val boxColor = if (isDark) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.06f)
+    val colorScheme = MaterialTheme.colorScheme
+    val accent = colorScheme.primary
+    val boxColor = colorScheme.surfaceVariant.copy(alpha = 0.3f)
     val peerHexRegex = remember { Regex("^[0-9a-fA-F]{16}$") }
 
     BlueTalkBottomSheet(
@@ -92,8 +92,8 @@ fun SecurityVerificationSheet(
             if (peerID == null) {
                 Text(
                     text = stringResource(R.string.fingerprint_no_peer),
-                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             } else {
                 val selectedPeerID = peerID!!
@@ -155,7 +155,6 @@ private fun SecurityVerificationHeader(
         Text(
             text = stringResource(R.string.security_verification_title),
             style = MaterialTheme.typography.titleSmall.copy(
-                fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold
             ),
             color = accent
@@ -186,10 +185,10 @@ private fun buildStatusInfo(
         else -> Icons.Outlined.NoEncryption
     }
     val tint = when {
-        isVerified -> Color(0xFF32D74B)
-        sessionState == "failed" -> Color(0xFFFF3B30)
-        sessionState == "handshaking" -> Color(0xFFFF9500)
-        sessionState == "established" -> Color(0xFF32D74B)
+        isVerified -> Color(0xFF00B2CA) // Ocean Teal
+        sessionState == "failed" -> Color(0xFFFF5252) // Soft Red
+        sessionState == "handshaking" -> Color(0xFF00B4D8) // Sky Blue
+        sessionState == "established" -> Color(0xFF00B2CA) // Ocean Teal
         else -> accent.copy(alpha = 0.6f)
     }
     return SecurityStatusInfo(text, icon, tint)
@@ -219,16 +218,13 @@ private fun SecurityStatusCard(
             Text(
                 text = displayName,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold
                 ),
                 color = accent
             )
             Text(
                 text = statusInfo.text,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontFamily = FontFamily.Monospace
-                ),
+                style = MaterialTheme.typography.bodySmall,
                 color = accent.copy(alpha = 0.8f)
             )
         }
@@ -251,14 +247,13 @@ private fun SecurityVerificationActions(
             onClick = onStartHandshake,
             colors = ButtonDefaults.buttonColors(
                 containerColor = accent,
-                contentColor = Color.White
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = stringResource(R.string.fingerprint_start_handshake),
-                fontFamily = FontFamily.Monospace,
-                fontSize = 12.sp
+                style = MaterialTheme.typography.labelLarge
             )
         }
     }
@@ -266,15 +261,13 @@ private fun SecurityVerificationActions(
     if (isVerified) {
         VerificationStatusRow(
             icon = Icons.Filled.Verified,
-            iconTint = Color(0xFF32D74B),
+            iconTint = Color(0xFF00B2CA),
             text = stringResource(R.string.fingerprint_verified_label),
-            textTint = Color(0xFF32D74B)
+            textTint = Color(0xFF00B2CA)
         )
         Text(
             text = stringResource(R.string.fingerprint_verified_message),
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontFamily = FontFamily.Monospace
-            ),
+            style = MaterialTheme.typography.bodySmall,
             color = accent.copy(alpha = 0.7f),
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
@@ -282,29 +275,26 @@ private fun SecurityVerificationActions(
         Button(
             onClick = { fingerprint?.let(onUnverify) },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFFF3B30),
+                containerColor = Color(0xFFFF5252),
                 contentColor = Color.White
             ),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = stringResource(R.string.verify_remove),
-                fontFamily = FontFamily.Monospace,
-                fontSize = 12.sp
+                style = MaterialTheme.typography.labelLarge
             )
         }
     } else {
         VerificationStatusRow(
             icon = Icons.Filled.Warning,
-            iconTint = Color(0xFFFF9500),
+            iconTint = Color(0xFF00B4D8),
             text = stringResource(R.string.fingerprint_not_verified_label),
-            textTint = Color(0xFFFF9500)
+            textTint = Color(0xFF00B4D8)
         )
         Text(
             text = stringResource(R.string.fingerprint_not_verified_message_fmt, displayName),
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontFamily = FontFamily.Monospace
-            ),
+            style = MaterialTheme.typography.bodySmall,
             color = accent.copy(alpha = 0.7f),
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
@@ -313,15 +303,14 @@ private fun SecurityVerificationActions(
             Button(
                 onClick = { onVerify(fingerprint) },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF34C759),
+                    containerColor = Color(0xFF00B2CA),
                     contentColor = Color.White
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = stringResource(R.string.fingerprint_mark_verified),
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         }
@@ -349,7 +338,6 @@ private fun VerificationStatusRow(
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium.copy(
-                fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold
             ),
             color = textTint
@@ -375,7 +363,6 @@ private fun FingerprintBlock(
         Text(
             text = title,
             style = MaterialTheme.typography.labelSmall.copy(
-                fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold
             ),
             color = accent.copy(alpha = 0.8f)
@@ -385,7 +372,6 @@ private fun FingerprintBlock(
                 Text(
                     text = formatFingerprint(fingerprint),
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = FontFamily.Monospace,
                         fontSize = 14.sp
                     ),
                     color = accent,
@@ -417,8 +403,8 @@ private fun FingerprintBlock(
         } else {
             Text(
                 text = stringResource(R.string.fingerprint_pending),
-                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
-                color = Color(0xFFFF9500),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF00B4D8),
                 modifier = Modifier.padding(16.dp)
             )
         }

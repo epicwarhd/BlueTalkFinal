@@ -27,11 +27,11 @@ import java.util.*
  */
 fun getRSSIColor(rssi: Int): Color {
     return when {
-        rssi >= -50 -> Color(0xFF00FF00) // Bright green
-        rssi >= -60 -> Color(0xFF80FF00) // Green-yellow
-        rssi >= -70 -> Color(0xFFFFFF00) // Yellow
-        rssi >= -80 -> Color(0xFFFF8000) // Orange
-        else -> Color(0xFFFF4444) // Red
+        rssi >= -50 -> Color(0xFF0288D1) // Deep Ocean Blue (Good)
+        rssi >= -60 -> Color(0xFF03A9F4) // Light Blue
+        rssi >= -70 -> Color(0xFF4FC3F7) // Pale Blue
+        rssi >= -80 -> Color(0xFF81D4FA) // Very Pale Blue
+        else -> Color(0xFFB0BEC5) // Blue Grey (Weak)
     }
 }
 
@@ -55,9 +55,9 @@ fun formatMessageAsAnnotatedString(
                  message.sender.startsWith("$currentUserNickname#")
     
     if (message.sender != "system") {
-        // Get base color for this peer (iOS-style color assignment)
+        // Get base color for this peer
         val baseColor = if (isSelf) {
-            Color(0xFFFF9500) // Orange for self (iOS orange)
+            colorScheme.primary // Use primary theme color for self
         } else {
             getPeerColor(message, isDark)
         }
@@ -117,12 +117,11 @@ fun formatMessageAsAnnotatedString(
         builder.pop()
         
         // Message content with iOS-style hashtag and mention highlighting
-        appendIOSFormattedContent(builder, message.content, message.mentions, currentUserNickname, baseColor, isSelf, isDark)
+        appendIOSFormattedContent(builder, message.content, message.mentions, currentUserNickname, baseColor, isSelf, isDark, colorScheme)
         
-        // iOS-style timestamp at the END (smaller, grey)
         // Timestamp (and optional PoW badge)
         builder.pushStyle(SpanStyle(
-            color = Color.Gray.copy(alpha = 0.7f),
+            color = colorScheme.onSurface.copy(alpha = 0.5f),
             fontSize = (BASE_FONT_SIZE - 4).sp
         ))
         builder.append(" [${timeFormatter.format(message.timestamp)}]")
@@ -135,18 +134,18 @@ fun formatMessageAsAnnotatedString(
         builder.pop()
         
     } else {
-        // System message - iOS style
+        // System message
         builder.pushStyle(SpanStyle(
-            color = Color.Gray,
+            color = colorScheme.secondary.copy(alpha = 0.8f),
             fontSize = (BASE_FONT_SIZE - 2).sp,
-            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+            fontStyle = FontStyle.Italic
         ))
-        builder.append("* ${message.content} *")
+        builder.append("• ${message.content} •")
         builder.pop()
         
-        // Timestamp for system messages too
+        // Timestamp for system messages
         builder.pushStyle(SpanStyle(
-            color = Color.Gray.copy(alpha = 0.5f),
+            color = colorScheme.onSurface.copy(alpha = 0.4f),
             fontSize = (BASE_FONT_SIZE - 4).sp
         ))
         builder.append(" [${timeFormatter.format(message.timestamp)}]")
@@ -174,7 +173,7 @@ fun formatMessageHeaderAnnotatedString(
             message.sender.startsWith("$currentUserNickname#")
 
     if (message.sender != "system") {
-        val baseColor = if (isSelf) Color(0xFFFF9500) else getPeerColor(message, isDark)
+        val baseColor = if (isSelf) colorScheme.primary else getPeerColor(message, isDark)
         val (baseName, suffix) = splitSuffix(message.sender)
 
         // "<@"
@@ -338,7 +337,8 @@ private fun appendIOSFormattedContent(
     currentUserNickname: String,
     baseColor: Color,
     isSelf: Boolean,
-    isDark: Boolean
+    isDark: Boolean,
+    colorScheme: ColorScheme
 ) {
     // iOS-style patterns: allow optional '#abcd' suffix in mentions
     val hashtagPattern = "#([a-zA-Z0-9_]+)".toRegex()
@@ -442,7 +442,7 @@ private fun appendIOSFormattedContent(
                 
                 // Check if this mention targets current user
                 val isMentionToMe = mBase == currentUserNickname
-                val mentionColor = if (isMentionToMe) Color(0xFFFF9500) else baseColor
+                val mentionColor = if (isMentionToMe) colorScheme.primary else baseColor
                 
                 // "@" symbol
                 builder.pushStyle(SpanStyle(
@@ -491,9 +491,9 @@ private fun appendIOSFormattedContent(
             }
             else -> {
                 if (type == "geohash") {
-                    // Style geohash in blue, underlined, and add click annotation
+                    // Style geohash in secondary color, underlined
                     builder.pushStyle(SpanStyle(
-                        color = Color(0xFF007AFF),
+                        color = colorScheme.secondary,
                         fontSize = BASE_FONT_SIZE.sp,
                         fontWeight = if (isSelf) FontWeight.Bold else FontWeight.SemiBold,
                         textDecoration = TextDecoration.Underline
@@ -510,9 +510,9 @@ private fun appendIOSFormattedContent(
                     )
                     builder.pop()
                 } else if (type == "url") {
-                    // Style URL in blue, underlined, and add click annotation with the raw text
+                    // Style URL in secondary color, underlined
                     builder.pushStyle(SpanStyle(
-                        color = Color(0xFF007AFF),
+                        color = colorScheme.secondary,
                         fontSize = BASE_FONT_SIZE.sp,
                         fontWeight = if (isSelf) FontWeight.Bold else FontWeight.SemiBold,
                         textDecoration = TextDecoration.Underline

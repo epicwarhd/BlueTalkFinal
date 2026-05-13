@@ -53,7 +53,7 @@ import com.bluetalk.android.ui.media.FilePickerButton
  * VisualTransformation that styles slash commands with background and color
  * while preserving cursor positioning and click handling
  */
-class SlashCommandVisualTransformation : VisualTransformation {
+class SlashCommandVisualTransformation(private val colorScheme: ColorScheme) : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         val slashCommandRegex = Regex("(/\\w+)(?=\\s|$)")
         val annotatedString = buildAnnotatedString {
@@ -68,10 +68,8 @@ class SlashCommandVisualTransformation : VisualTransformation {
                 // Add the styled slash command
                 withStyle(
                     style = SpanStyle(
-                        color = Color(0xFF00FF7F), // Bright green
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Medium,
-                        background = Color(0xFF2D2D2D) // Dark gray background
+                        color = colorScheme.primary,
+                        fontWeight = FontWeight.Bold
                     )
                 ) {
                     append(match.value)
@@ -97,7 +95,7 @@ class SlashCommandVisualTransformation : VisualTransformation {
  * VisualTransformation that styles mentions with background and color
  * while preserving cursor positioning and click handling
  */
-class MentionVisualTransformation : VisualTransformation {
+class MentionVisualTransformation(private val colorScheme: ColorScheme) : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         val mentionRegex = Regex("@([a-zA-Z0-9_]+)")
         val annotatedString = buildAnnotatedString {
@@ -112,8 +110,7 @@ class MentionVisualTransformation : VisualTransformation {
                 // Add the styled mention
                 withStyle(
                     style = SpanStyle(
-                        color = Color(0xFFFF9500), // Orange
-                        fontFamily = FontFamily.Monospace,
+                        color = colorScheme.secondary,
                         fontWeight = FontWeight.SemiBold
                     )
                 ) {
@@ -175,194 +172,142 @@ fun MessageInput(
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val isFocused = remember { mutableStateOf(false) }
-    val hasText = value.text.isNotBlank() // Check if there's text for send button state
+    val hasText = value.text.isNotBlank()
     val keyboard = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
     var isRecording by remember { mutableStateOf(false) }
     var elapsedMs by remember { mutableStateOf(0L) }
     var amplitude by remember { mutableStateOf(0) }
 
-    Row(
-        modifier = modifier.padding(horizontal = 12.dp, vertical = 8.dp), // Reduced padding
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    Surface(
+        modifier = modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        shape = RoundedCornerShape(28.dp),
+        color = colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        tonalElevation = 2.dp
     ) {
-        // Text input with placeholder OR visualizer when recording
-        Box(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Always keep the text field mounted to retain focus and avoid IME collapse
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    color = colorScheme.primary,
-                    fontFamily = FontFamily.Monospace
-                ),
-                cursorBrush = SolidColor(if (isRecording) Color.Transparent else colorScheme.primary),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                keyboardActions = KeyboardActions(onSend = { 
-                    if (hasText) onSend() // Only send if there's text
-                }),
-                visualTransformation = CombinedVisualTransformation(
-                    listOf(SlashCommandVisualTransformation(), MentionVisualTransformation())
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester)
-                    .onFocusChanged { focusState ->
-                        isFocused.value = focusState.isFocused
-                    }
-            )
-
-            // Show placeholder when there's no text and not recording
-            if (value.text.isEmpty() && !isRecording) {
-                Text(
-                    text = stringResource(R.string.type_a_message_placeholder),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = FontFamily.Monospace
+            // Text input with placeholder OR visualizer when recording
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        color = colorScheme.onSurface
                     ),
-                    color = colorScheme.onSurface.copy(alpha = 0.5f), // Muted grey
-                    modifier = Modifier.fillMaxWidth()
+                    cursorBrush = SolidColor(if (isRecording) Color.Transparent else colorScheme.primary),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                    keyboardActions = KeyboardActions(onSend = { 
+                        if (hasText) onSend()
+                    }),
+                    visualTransformation = CombinedVisualTransformation(
+                        listOf(
+                            SlashCommandVisualTransformation(colorScheme), 
+                            MentionVisualTransformation(colorScheme)
+                        )
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                        .onFocusChanged { focusState ->
+                            isFocused.value = focusState.isFocused
+                        }
                 )
-            }
 
-            // Overlay the real-time scrolling waveform while recording
-            if (isRecording) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    RealtimeScrollingWaveform(
-                        modifier = Modifier.weight(1f).height(32.dp),
-                        amplitudeNorm = normalizeAmplitudeSample(amplitude)
-                    )
-                    Spacer(Modifier.width(20.dp))
-                    val secs = (elapsedMs / 1000).toInt()
-                    val mm = secs / 60
-                    val ss = secs % 60
-                    val maxSecs = 10 // 10 second max recording time
-                    val maxMm = maxSecs / 60
-                    val maxSs = maxSecs % 60
+                // Show placeholder
+                if (value.text.isEmpty() && !isRecording) {
                     Text(
-                        text = String.format("%02d:%02d / %02d:%02d", mm, ss, maxMm, maxSs),
-                        fontFamily = FontFamily.Monospace,
-                        color = colorScheme.primary,
-                        fontSize = (BASE_FONT_SIZE - 4).sp
+                        text = stringResource(R.string.type_a_message_placeholder),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
+
+                // Overlay waveform
+                if (isRecording) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().background(colorScheme.surfaceVariant.copy(alpha = 0.5f))) {
+                        RealtimeScrollingWaveform(
+                            modifier = Modifier.weight(1f).height(24.dp),
+                            amplitudeNorm = normalizeAmplitudeSample(amplitude)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        val secs = (elapsedMs / 1000).toInt()
+                        Text(
+                            text = String.format("%02d:%02d", secs / 60, secs % 60),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = colorScheme.primary
+                        )
+                    }
+                }
             }
-        }
-        
-        Spacer(modifier = Modifier.width(8.dp)) // Reduced spacing
-        
-        // Voice and image buttons when no text (only visible in Mesh chat)
-        if (value.text.isEmpty() && showMediaButtons) {
-            // Hold-to-record microphone
-            val bg = if (colorScheme.background == Color.Black) Color(0xFF00FF00).copy(alpha = 0.75f) else Color(0xFF008000).copy(alpha = 0.75f)
-
-            // Ensure latest values are used when finishing recording
-            val latestSelectedPeer = rememberUpdatedState(selectedPrivatePeer)
-            val latestChannel = rememberUpdatedState(currentChannel)
-            val latestOnSendVoiceNote = rememberUpdatedState(onSendVoiceNote)
-
-            // Image button (image picker) - hide during recording
-            if (!isRecording) {
-                // Revert to original separate buttons: round File button (left) and the old Image plus button (right)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    // DISABLE FILE PICKER
-                    //FilePickerButton(
-                    //    onFileReady = { path ->
-                    //        onSendFileNote(latestSelectedPeer.value, latestChannel.value, path)
-                    //    }
-                    //)
+            
+            // Media buttons
+            if (value.text.isEmpty() && showMediaButtons && !isRecording) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     ImagePickerButton(
                         onImageReady = { outPath ->
-                            onSendImageNote(latestSelectedPeer.value, latestChannel.value, outPath)
+                            onSendImageNote(selectedPrivatePeer, currentChannel, outPath)
                         }
                     )
                 }
             }
 
-            Spacer(Modifier.width(1.dp))
-
-            VoiceRecordButton(
-                backgroundColor = bg,
-                onStart = {
-                    isRecording = true
-                    elapsedMs = 0L
-                    // Keep existing focus to avoid IME collapse, but do not force-show keyboard
-                    if (isFocused.value) {
-                        try { focusRequester.requestFocus() } catch (_: Exception) {}
-                    }
-                },
-                onAmplitude = { amp, ms ->
-                    amplitude = amp
-                    elapsedMs = ms
-                },
-                onFinish = { path ->
-                    isRecording = false
-                    // Extract and cache waveform from the actual audio file to match receiver rendering
-                    AudioWaveformExtractor.extractAsync(path, sampleCount = 120) { arr ->
-                        if (arr != null) {
-                            try { com.bluetalk.android.features.voice.VoiceWaveformCache.put(path, arr) } catch (_: Exception) {}
+            // Action Button (Voice or Send)
+            if (value.text.isEmpty() && showMediaButtons) {
+                VoiceRecordButton(
+                    backgroundColor = colorScheme.primary,
+                    onStart = {
+                        isRecording = true
+                        elapsedMs = 0L
+                    },
+                    onAmplitude = { amp, ms ->
+                        amplitude = amp
+                        elapsedMs = ms
+                    },
+                    onFinish = { path ->
+                        isRecording = false
+                        AudioWaveformExtractor.extractAsync(path, sampleCount = 120) { arr ->
+                            if (arr != null) {
+                                try { com.bluetalk.android.features.voice.VoiceWaveformCache.put(path, arr) } catch (_: Exception) {}
+                            }
                         }
+                        onSendVoiceNote(selectedPrivatePeer, currentChannel, path)
                     }
-                    // BLE path (private or public) — use latest values to avoid stale captures
-                    latestOnSendVoiceNote.value(
-                        latestSelectedPeer.value,
-                        latestChannel.value,
-                        path
-                    )
-                }
-            )
-            
-        } else {
-            // Send button with enabled/disabled state
-            IconButton(
-                onClick = { if (hasText) onSend() }, // Only execute if there's text
-                enabled = hasText, // Enable only when there's text
-                modifier = Modifier.size(32.dp)
-            ) {
-                // Update send button to match input field colors
-                Box(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .background(
-                            color = if (!hasText) {
-                                // Disabled state - muted grey
-                                colorScheme.onSurface.copy(alpha = 0.3f)
-                            } else if (selectedPrivatePeer != null || currentChannel != null) {
-                                // Orange for both private messages and channels when enabled
-                                Color(0xFFFF9500).copy(alpha = 0.75f)
-                            } else if (colorScheme.background == Color.Black) {
-                                Color(0xFF00FF00).copy(alpha = 0.75f) // Bright green for dark theme
-                            } else {
-                                Color(0xFF008000).copy(alpha = 0.75f) // Dark green for light theme
-                            },
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
+                )
+            } else {
+                IconButton(
+                    onClick = { if (hasText) onSend() },
+                    enabled = hasText,
+                    modifier = Modifier.size(32.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowUpward,
-                        contentDescription = stringResource(id = R.string.send_message),
-                        modifier = Modifier.size(20.dp),
-                        tint = if (!hasText) {
-                            // Disabled state - muted grey icon
-                            colorScheme.onSurface.copy(alpha = 0.5f)
-                        } else if (selectedPrivatePeer != null || currentChannel != null) {
-                            // Black arrow on orange for both private and channel modes
-                            Color.Black
-                        } else if (colorScheme.background == Color.Black) {
-                            Color.Black // Black arrow on bright green in dark theme
-                        } else {
-                            Color.White // White arrow on dark green in light theme
-                        }
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(
+                                color = if (hasText) colorScheme.primary else colorScheme.onSurface.copy(alpha = 0.1f),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowUpward,
+                            contentDescription = stringResource(id = R.string.send_message),
+                            modifier = Modifier.size(20.dp),
+                            tint = if (hasText) colorScheme.onPrimary else colorScheme.onSurface.copy(alpha = 0.3f)
+                        )
+                    }
                 }
             }
         }
     }
-
-    // Auto-stop handled inside VoiceRecordButton
 }
 
 @Composable
@@ -415,8 +360,7 @@ fun CommandSuggestionItem(
         Text(
             text = allCommands.joinToString(", "),
             style = MaterialTheme.typography.bodySmall.copy(
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Bold
             ),
             color = colorScheme.primary,
             fontSize = (BASE_FONT_SIZE - 4).sp
@@ -426,9 +370,7 @@ fun CommandSuggestionItem(
         suggestion.syntax?.let { syntax ->
             Text(
                 text = syntax,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontFamily = FontFamily.Monospace
-                ),
+                style = MaterialTheme.typography.bodySmall,
                 color = colorScheme.onSurface.copy(alpha = 0.8f),
                 fontSize = (BASE_FONT_SIZE - 5).sp
             )
@@ -437,9 +379,7 @@ fun CommandSuggestionItem(
         // Show description
         Text(
             text = suggestion.description,
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontFamily = FontFamily.Monospace
-            ),
+            style = MaterialTheme.typography.bodySmall,
             color = colorScheme.onSurface.copy(alpha = 0.7f),
             fontSize = (BASE_FONT_SIZE - 5).sp,
             maxLines = 1,
@@ -489,10 +429,9 @@ fun MentionSuggestionItem(
         Text(
             text = stringResource(R.string.mention_suggestion_at, suggestion),
             style = MaterialTheme.typography.bodySmall.copy(
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Bold
             ),
-            color = Color(0xFFFF9500), // Orange like mentions
+            color = colorScheme.secondary,
             fontSize = (BASE_FONT_SIZE - 4).sp
         )
         
@@ -500,9 +439,7 @@ fun MentionSuggestionItem(
         
         Text(
             text = stringResource(R.string.mention),
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontFamily = FontFamily.Monospace
-            ),
+            style = MaterialTheme.typography.bodySmall,
             color = colorScheme.onSurface.copy(alpha = 0.7f),
             fontSize = (BASE_FONT_SIZE - 5).sp
         )

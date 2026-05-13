@@ -16,30 +16,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 
-// Colors that match the iOS bluetalk theme
+// Colors for the Ocean Blue theme
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF39FF14),        // Bright green (terminal-like)
-    onPrimary = Color.Black,
-    secondary = Color(0xFF2ECB10),      // Darker green
-    onSecondary = Color.Black,
-    background = Color.Black,
-    onBackground = Color(0xFF39FF14),   // Green on black
-    surface = Color(0xFF111111),        // Very dark gray
-    onSurface = Color(0xFF39FF14),      // Green text
-    error = Color(0xFFFF5555),          // Red for errors
-    onError = Color.Black
+    primary = Color(0xFF4FC3F7),        // Ocean Light Blue
+    onPrimary = Color(0xFF00344F),
+    secondary = Color(0xFF03A9F4),
+    onSecondary = Color.White,
+    background = Color(0xFF010B13),     // Very dark ocean blue
+    onBackground = Color(0xFFE1F5FE),   // Very light blue text
+    surface = Color(0xFF0A1929),        // Dark blue gray surface
+    onSurface = Color(0xFFE1F5FE),      // Very light blue text
+    error = Color(0xFFFFB4AB),
+    onError = Color(0xFF690005)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF008000),        // Dark green
+    primary = Color(0xFF0277BD),        // Deep Ocean Blue
     onPrimary = Color.White,
-    secondary = Color(0xFF006600),      // Even darker green
+    secondary = Color(0xFF0288D1),
     onSecondary = Color.White,
-    background = Color.White,
-    onBackground = Color(0xFF008000),   // Dark green on white
-    surface = Color(0xFFF8F8F8),        // Very light gray
-    onSurface = Color(0xFF008000),      // Dark green text
-    error = Color(0xFFCC0000),          // Dark red for errors
+    background = Color(0xFFF0F7FA),     // Very light blue background
+    onBackground = Color(0xFF010B13),   // Very dark blue text
+    surface = Color.White,
+    onSurface = Color(0xFF010B13),
+    error = Color(0xFFBA1A1A),
     onError = Color.White
 )
 

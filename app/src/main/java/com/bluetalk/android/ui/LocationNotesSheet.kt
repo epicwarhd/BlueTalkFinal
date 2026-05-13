@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.*
@@ -50,10 +51,7 @@ fun LocationNotesSheet(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val isDark = isSystemInDarkTheme()
-    
-    // iOS color scheme
-    val accentGreen = if (isDark) Color.Green else Color(0xFF008000) // dark: green, light: dark green (0, 0.5, 0)
+    val colorScheme = MaterialTheme.colorScheme
     
     // Managers
     val notesManager = remember { LocationNotesManager.getInstance() }
@@ -120,7 +118,7 @@ fun LocationNotesSheet(
                     LocationNotesHeader(
                         locationName = displayLocationName,
                         state = state,
-                        accentGreen = accentGreen,
+                        accentColor = colorScheme.primary,
                     )
                 }
 
@@ -196,12 +194,11 @@ fun LocationNotesSheet(
                         thickness = 1.dp
                     )
 
-                    // Input section (matches iOS inputSection)
+                    // Input section
                     LocationNotesInputSection(
                         draft = draft,
                         onDraftChange = { draft = it },
                         sendButtonEnabled = sendButtonEnabled,
-                        accentGreen = accentGreen,
                         onSend = {
                             val content = draft.trim()
                             if (content.isNotEmpty()) {
@@ -224,7 +221,7 @@ fun LocationNotesSheet(
 private fun LocationNotesHeader(
     locationName: String?,
     state: LocationNotesManager.State,
-    accentGreen: Color,
+    accentColor: Color,
 ) {
     Column(
         modifier = Modifier
@@ -232,14 +229,13 @@ private fun LocationNotesHeader(
             .padding(horizontal = 16.dp)
             .padding(bottom = 12.dp)
     ) {
-        // Location name in green (building or block)
+        // Location name in accent color
         locationName?.let { name ->
             if (name.isNotEmpty()) {
                 Text(
                     text = name,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp,
-                    color = accentGreen
+                    style = MaterialTheme.typography.labelMedium,
+                    color = accentColor
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -248,8 +244,7 @@ private fun LocationNotesHeader(
         // Description
         Text(
             text = stringResource(R.string.location_notes_description),
-            fontFamily = FontFamily.Monospace,
-            fontSize = 12.sp,
+            style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
         
@@ -258,8 +253,7 @@ private fun LocationNotesHeader(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.location_notes_relays_unavailable),
-                fontFamily = FontFamily.Monospace,
-                fontSize = 11.sp,
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
@@ -289,17 +283,15 @@ private fun NoteRow(note: LocationNotesManager.Note) {
         ) {
             Text(
                 text = "@$baseName",
-                fontFamily = FontFamily.Monospace,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
             )
             if (ts.isNotEmpty()) {
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = ts,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 11.sp,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
@@ -310,8 +302,7 @@ private fun NoteRow(note: LocationNotesManager.Note) {
         // Second row: content
         Text(
             text = note.content,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
     }
@@ -450,85 +441,78 @@ private fun LocationNotesInputSection(
     draft: String,
     onDraftChange: (String) -> Unit,
     sendButtonEnabled: Boolean,
-    accentGreen: Color,
     onSend: () -> Unit
 ) {
     val isDark = isSystemInDarkTheme()
     val colorScheme = MaterialTheme.colorScheme
     
-    Row(
+    Surface(
+        tonalElevation = 2.dp,
+        shape = RoundedCornerShape(24.dp),
+        color = colorScheme.surfaceVariant.copy(alpha = 0.3f),
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = colorScheme.background)
-            .padding(horizontal = 12.dp, vertical = 8.dp), // Match main chat padding
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp) // Match main chat spacing
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        // Text input with placeholder overlay (matches main chat exactly)
-        Box(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            androidx.compose.foundation.text.BasicTextField(
-                value = draft,
-                onValueChange = onDraftChange,
-                textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    color = colorScheme.primary,
-                    fontFamily = FontFamily.Monospace
-                ),
-                cursorBrush = androidx.compose.ui.graphics.SolidColor(colorScheme.primary),
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                    imeAction = androidx.compose.ui.text.input.ImeAction.Send
-                ),
-                keyboardActions = androidx.compose.foundation.text.KeyboardActions(
-                    onSend = { if (sendButtonEnabled) onSend() }
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            // Placeholder when empty (matches main chat)
-            if (draft.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.location_notes_input_placeholder),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = FontFamily.Monospace
+            // Text input
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                androidx.compose.foundation.text.BasicTextField(
+                    value = draft,
+                    onValueChange = onDraftChange,
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(
+                        color = colorScheme.onSurface
                     ),
-                    color = colorScheme.onSurface.copy(alpha = 0.5f),
+                    cursorBrush = androidx.compose.ui.graphics.SolidColor(colorScheme.primary),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Send
+                    ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                        onSend = { if (sendButtonEnabled) onSend() }
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
+                
+                // Placeholder
+                if (draft.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.location_notes_input_placeholder),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
-        }
-        
-        // Send button - circular with icon (matches main chat exactly)
-        IconButton(
-            onClick = { if (sendButtonEnabled) onSend() },
-            enabled = sendButtonEnabled,
-            modifier = Modifier.size(32.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(30.dp)
-                    .background(
-                        color = if (!sendButtonEnabled) {
-                            colorScheme.onSurface.copy(alpha = 0.3f)
-                        } else {
-                            accentGreen.copy(alpha = 0.75f)
-                        },
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
+            
+            // Send button
+            IconButton(
+                onClick = { if (sendButtonEnabled) onSend() },
+                enabled = sendButtonEnabled,
+                modifier = Modifier.size(32.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowUpward,
-                    contentDescription = stringResource(R.string.send_message),
-                    modifier = Modifier.size(20.dp),
-                    tint = if (!sendButtonEnabled) {
-                        colorScheme.onSurface.copy(alpha = 0.5f)
-                    } else if (isDark) {
-                        Color.Black // Black arrow on green in dark theme
-                    } else {
-                        Color.White // White arrow on green in light theme
-                    }
-                )
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(
+                            color = if (sendButtonEnabled) colorScheme.primary else colorScheme.onSurface.copy(alpha = 0.1f),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowUpward,
+                        contentDescription = stringResource(R.string.send_message),
+                        modifier = Modifier.size(20.dp),
+                        tint = if (sendButtonEnabled) colorScheme.onPrimary else colorScheme.onSurface.copy(alpha = 0.3f)
+                    )
+                }
             }
         }
     }
