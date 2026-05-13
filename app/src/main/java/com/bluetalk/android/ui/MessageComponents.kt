@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.bluetalk.android.ui.media.FileMessageItem
 import com.bluetalk.android.model.BlueTalkMessageType
 import com.bluetalk.android.R
@@ -319,42 +320,53 @@ fun MessageItem(
                 modifier = Modifier.align(if (isSelf) Alignment.End else Alignment.Start),
                 horizontalArrangement = if (isSelf) Arrangement.End else Arrangement.Start
             ) {
-                Box {
-                    if (packet != null) {
-                        if (overrideProgress != null) {
-                            // Show sending animation while in-flight
-                            com.bluetalk.android.ui.media.FileSendingAnimation(
-                                fileName = packet.fileName,
-                                progress = overrideProgress,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        } else {
-                            // Static file display with open/save dialog
-                            FileMessageItem(
-                                packet = packet,
-                                onFileClick = {
-                                    // handled inside FileMessageItem via dialog
-                                }
-                            )
-                        }
-
-                        // Cancel button overlay during sending
-                        val showCancel = isSelf && (message.deliveryStatus is DeliveryStatus.PartiallyDelivered)
-                        if (showCancel) {
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(4.dp)
-                                    .size(22.dp)
-                                    .background(Color.Gray.copy(alpha = 0.6f), CircleShape)
-                                    .clickable { onCancelTransfer?.invoke(message) },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(imageVector = Icons.Filled.Close, contentDescription = stringResource(R.string.cd_cancel), tint = Color.White, modifier = Modifier.size(14.dp))
+                Surface(
+                    color = if (isSelf) Color(0xFFD1E4FF) else Color(0xFFF2F2F7),
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomStart = if (isSelf) 16.dp else 2.dp,
+                        bottomEnd = if (isSelf) 2.dp else 16.dp
+                    ),
+                    shadowElevation = 1.dp
+                ) {
+                    Box(modifier = Modifier.padding(8.dp)) {
+                        if (packet != null) {
+                            if (overrideProgress != null) {
+                                // Show sending animation while in-flight
+                                com.bluetalk.android.ui.media.FileSendingAnimation(
+                                    fileName = packet.fileName,
+                                    progress = overrideProgress,
+                                    modifier = Modifier.widthIn(max = 250.dp)
+                                )
+                            } else {
+                                // Static file display with open/save dialog
+                                FileMessageItem(
+                                    packet = packet,
+                                    onFileClick = {
+                                        // handled inside FileMessageItem via dialog
+                                    }
+                                )
                             }
+
+                            // Cancel button overlay during sending
+                            val showCancel = isSelf && (message.deliveryStatus is DeliveryStatus.PartiallyDelivered)
+                            if (showCancel) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(4.dp)
+                                        .size(22.dp)
+                                        .background(Color.Gray.copy(alpha = 0.6f), CircleShape)
+                                        .clickable { onCancelTransfer?.invoke(message) },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(imageVector = Icons.Filled.Close, contentDescription = stringResource(R.string.cd_cancel), tint = Color.White, modifier = Modifier.size(14.dp))
+                                }
+                            }
+                        } else {
+                            Text(text = stringResource(R.string.file_unavailable), fontFamily = FontFamily.Monospace, color = Color.Gray)
                         }
-                    } else {
-                        Text(text = stringResource(R.string.file_unavailable), fontFamily = FontFamily.Monospace, color = Color.Gray)
                     }
                 }
             }
@@ -398,85 +410,100 @@ fun MessageItem(
         val haptic = LocalHapticFeedback.current
         val context = LocalContext.current
         var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
-        Text(
-            text = annotatedText,
-            modifier = modifier.pointerInput(message) {
-                detectTapGestures(
-                    onTap = { position ->
-                        val layout = textLayoutResult ?: return@detectTapGestures
-                        val offset = layout.getOffsetForPosition(position)
-                        // Nickname click only when not self
-                        if (!isSelf && onNicknameClick != null) {
-                            val nicknameAnnotations = annotatedText.getStringAnnotations(
-                                tag = "nickname_click",
-                                start = offset,
-                                end = offset
-                            )
-                            if (nicknameAnnotations.isNotEmpty()) {
-                                val nickname = nicknameAnnotations.first().item
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                onNicknameClick.invoke(nickname)
-                                return@detectTapGestures
-                            }
-                        }
-                        // Geohash teleport (all messages)
-                        val geohashAnnotations = annotatedText.getStringAnnotations(
-                            tag = "geohash_click",
-                            start = offset,
-                            end = offset
-                        )
-                        if (geohashAnnotations.isNotEmpty()) {
-                            val geohash = geohashAnnotations.first().item
-                            try {
-                                val locationManager = com.bluetalk.android.geohash.LocationChannelManager.getInstance(
-                                    context
-                                )
-                                val level = when (geohash.length) {
-                                    in 0..2 -> com.bluetalk.android.geohash.GeohashChannelLevel.REGION
-                                    in 3..4 -> com.bluetalk.android.geohash.GeohashChannelLevel.PROVINCE
-                                    5 -> com.bluetalk.android.geohash.GeohashChannelLevel.CITY
-                                    6 -> com.bluetalk.android.geohash.GeohashChannelLevel.NEIGHBORHOOD
-                                    else -> com.bluetalk.android.geohash.GeohashChannelLevel.BLOCK
-                                }
-                                val channel = com.bluetalk.android.geohash.GeohashChannel(level, geohash.lowercase())
-                                locationManager.setTeleported(true)
-                                locationManager.select(com.bluetalk.android.geohash.ChannelID.Location(channel))
-                            } catch (_: Exception) { }
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            return@detectTapGestures
-                        }
-                        // URL open (all messages)
-                        val urlAnnotations = annotatedText.getStringAnnotations(
-                            tag = "url_click",
-                            start = offset,
-                            end = offset
-                        )
-                        if (urlAnnotations.isNotEmpty()) {
-                            val raw = urlAnnotations.first().item
-                            val resolved = if (raw.startsWith("http://", ignoreCase = true) || raw.startsWith("https://", ignoreCase = true)) raw else "https://$raw"
-                            try {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(resolved))
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                context.startActivity(intent)
-                            } catch (_: Exception) { }
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            return@detectTapGestures
-                        }
-                    },
-                    onLongPress = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onMessageLongPress?.invoke(message)
-                    }
-                )
-            },
-            fontFamily = FontFamily.Monospace,
-            softWrap = true,
-            overflow = TextOverflow.Visible,
-            style = androidx.compose.ui.text.TextStyle(
-                color = colorScheme.onSurface
+        
+        Surface(
+            modifier = modifier,
+            color = if (isSelf) Color(0xFFD1E4FF) else Color(0xFFF2F2F7),
+            shape = RoundedCornerShape(
+                topStart = 16.dp,
+                topEnd = 16.dp,
+                bottomStart = if (isSelf) 16.dp else 2.dp,
+                bottomEnd = if (isSelf) 2.dp else 16.dp
             ),
-            onTextLayout = { result -> textLayoutResult = result }
-        )
+            shadowElevation = 0.5.dp
+        ) {
+            Text(
+                text = annotatedText,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .pointerInput(message) {
+                        detectTapGestures(
+                            onTap = { position ->
+                                val layout = textLayoutResult ?: return@detectTapGestures
+                                val offset = layout.getOffsetForPosition(position)
+                                // Nickname click only when not self
+                                if (!isSelf && onNicknameClick != null) {
+                                    val nicknameAnnotations = annotatedText.getStringAnnotations(
+                                        tag = "nickname_click",
+                                        start = offset,
+                                        end = offset
+                                    )
+                                    if (nicknameAnnotations.isNotEmpty()) {
+                                        val nickname = nicknameAnnotations.first().item
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        onNicknameClick.invoke(nickname)
+                                        return@detectTapGestures
+                                    }
+                                }
+                                // Geohash teleport (all messages)
+                                val geohashAnnotations = annotatedText.getStringAnnotations(
+                                    tag = "geohash_click",
+                                    start = offset,
+                                    end = offset
+                                )
+                                if (geohashAnnotations.isNotEmpty()) {
+                                    val geohash = geohashAnnotations.first().item
+                                    try {
+                                        val locationManager = com.bluetalk.android.geohash.LocationChannelManager.getInstance(
+                                            context
+                                        )
+                                        val level = when (geohash.length) {
+                                            in 0..2 -> com.bluetalk.android.geohash.GeohashChannelLevel.REGION
+                                            in 3..4 -> com.bluetalk.android.geohash.GeohashChannelLevel.PROVINCE
+                                            5 -> com.bluetalk.android.geohash.GeohashChannelLevel.CITY
+                                            6 -> com.bluetalk.android.geohash.GeohashChannelLevel.NEIGHBORHOOD
+                                            else -> com.bluetalk.android.geohash.GeohashChannelLevel.BLOCK
+                                        }
+                                        val channel = com.bluetalk.android.geohash.GeohashChannel(level, geohash.lowercase())
+                                        locationManager.setTeleported(true)
+                                        locationManager.select(com.bluetalk.android.geohash.ChannelID.Location(channel))
+                                    } catch (_: Exception) { }
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    return@detectTapGestures
+                                }
+                                // URL open (all messages)
+                                val urlAnnotations = annotatedText.getStringAnnotations(
+                                    tag = "url_click",
+                                    start = offset,
+                                    end = offset
+                                )
+                                if (urlAnnotations.isNotEmpty()) {
+                                    val raw = urlAnnotations.first().item
+                                    val resolved = if (raw.startsWith("http://", ignoreCase = true) || raw.startsWith("https://", ignoreCase = true)) raw else "https://$raw"
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(resolved))
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        context.startActivity(intent)
+                                    } catch (_: Exception) { }
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    return@detectTapGestures
+                                }
+                            },
+                            onLongPress = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onMessageLongPress?.invoke(message)
+                            }
+                        )
+                    },
+                fontFamily = FontFamily.Monospace,
+                softWrap = true,
+                overflow = TextOverflow.Visible,
+                style = androidx.compose.ui.text.TextStyle(
+                    color = colorScheme.onSurface
+                ),
+                onTextLayout = { result -> textLayoutResult = result }
+            )
+        }
     }
 }
 

@@ -5,9 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -83,26 +85,38 @@ fun AudioMessageItem(
             onTextLayout = { headerLayout = it }
         )
 
-        Row(
+        Surface(
             modifier = Modifier.align(if (isSelf) Alignment.End else Alignment.Start),
-            verticalAlignment = Alignment.CenterVertically
+            color = if (isSelf) Color(0xFFD1E4FF) else Color(0xFFF2F2F7),
+            shape = RoundedCornerShape(
+                topStart = 16.dp,
+                topEnd = 16.dp,
+                bottomStart = if (isSelf) 16.dp else 2.dp,
+                bottomEnd = if (isSelf) 2.dp else 16.dp
+            ),
+            shadowElevation = 0.5.dp
         ) {
-            VoiceNotePlayer(
-                path = path,
-                progressOverride = overrideProgress,
-                progressColor = overrideColor
-            )
-            val showCancel = isSelf && (message.deliveryStatus is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered)
-            if (showCancel) {
-                Spacer(Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .size(26.dp)
-                        .background(Color.Gray.copy(alpha = 0.6f), CircleShape)
-                        .clickable { onCancelTransfer?.invoke(message) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(imageVector = Icons.Filled.Close, contentDescription = stringResource(R.string.cd_cancel), tint = Color.White, modifier = Modifier.size(16.dp))
+            Row(
+                modifier = Modifier.padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                VoiceNotePlayer(
+                    path = path,
+                    progressOverride = overrideProgress,
+                    progressColor = overrideColor
+                )
+                val showCancel = isSelf && (message.deliveryStatus is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered)
+                if (showCancel) {
+                    Spacer(Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(26.dp)
+                            .background(Color.Gray.copy(alpha = 0.6f), CircleShape)
+                            .clickable { onCancelTransfer?.invoke(message) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(imageVector = Icons.Filled.Close, contentDescription = stringResource(R.string.cd_cancel), tint = Color.White, modifier = Modifier.size(16.dp))
+                    }
                 }
             }
         }

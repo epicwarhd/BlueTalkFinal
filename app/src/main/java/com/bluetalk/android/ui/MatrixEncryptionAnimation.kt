@@ -3,8 +3,12 @@ package com.bluetalk.android.ui
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -221,16 +225,32 @@ private fun AnimatedMessageDisplay(
     }
     
     // Use IDENTICAL Text composable structure as normal message
-    Text(
-        text = annotatedText,
+    val isSelf = message.senderPeerID == meshService.myPeerID || 
+                 message.sender == currentUserNickname ||
+                 message.sender.startsWith("$currentUserNickname#")
+
+    Surface(
         modifier = modifier,
-        fontFamily = FontFamily.Monospace,
-        softWrap = true,
-        overflow = androidx.compose.ui.text.style.TextOverflow.Visible,
-        style = androidx.compose.ui.text.TextStyle(
-            color = colorScheme.onSurface
+        color = if (isSelf) Color(0xFFD1E4FF) else Color(0xFFF2F2F7),
+        shape = RoundedCornerShape(
+            topStart = 16.dp,
+            topEnd = 16.dp,
+            bottomStart = if (isSelf) 16.dp else 2.dp,
+            bottomEnd = if (isSelf) 2.dp else 16.dp
+        ),
+        shadowElevation = 0.5.dp
+    ) {
+        Text(
+            text = annotatedText,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            fontFamily = FontFamily.Monospace,
+            softWrap = true,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Visible,
+            style = androidx.compose.ui.text.TextStyle(
+                color = colorScheme.onSurface
+            )
         )
-    )
+    }
 }
 
 

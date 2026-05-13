@@ -6,10 +6,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -99,56 +101,68 @@ fun ImageMessageItem(
                 is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered -> if (st.total > 0) st.reached.toFloat() / st.total.toFloat() else 0f
                 else -> null
             }
+            val bubbleShape = RoundedCornerShape(
+                topStart = 16.dp,
+                topEnd = 16.dp,
+                bottomStart = if (isSelf) 16.dp else 2.dp,
+                bottomEnd = if (isSelf) 2.dp else 16.dp
+            )
             Row(
                 modifier = Modifier.align(if (isSelf) Alignment.End else Alignment.Start),
                 horizontalArrangement = if (isSelf) Arrangement.End else Arrangement.Start
             ) {
-                Box {
-                    if (progressFraction != null && progressFraction < 1f && isSelf) {
-                        // Cyberpunk block-reveal while sending
-                        BlockRevealImage(
-                            bitmap = img,
-                            progress = progressFraction,
-                            blocksX = 24,
-                            blocksY = 16,
-                            modifier = Modifier
-                                .widthIn(max = 300.dp)
-                                .aspectRatio(aspect)
-                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
-                                .clickable {
-                                    val currentIndex = imagePaths.indexOf(path)
-                                    onImageClick?.invoke(path, imagePaths, currentIndex)
-                                }
-                        )
-                    } else {
-                        // Fully revealed image
-                        Image(
-                            bitmap = img,
-                            contentDescription = stringResource(com.bluetalk.android.R.string.cd_image),
-                            modifier = Modifier
-                                .widthIn(max = 300.dp)
-                                .aspectRatio(aspect)
-                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
-                                .clickable {
-                                    val currentIndex = imagePaths.indexOf(path)
-                                    onImageClick?.invoke(path, imagePaths, currentIndex)
-                                },
-                            contentScale = ContentScale.Fit
-                        )
-                    }
-                    // Cancel button overlay during sending
-                    val showCancel = isSelf && (message.deliveryStatus is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered)
-                    if (showCancel) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(4.dp)
-                                .size(22.dp)
-                                .background(Color.Gray.copy(alpha = 0.6f), CircleShape)
-                                .clickable { onCancelTransfer?.invoke(message) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(imageVector = Icons.Filled.Close, contentDescription = stringResource(com.bluetalk.android.R.string.cd_cancel), tint = Color.White, modifier = Modifier.size(14.dp))
+                Surface(
+                    color = if (isSelf) Color(0xFFD1E4FF) else Color(0xFFF2F2F7),
+                    shape = bubbleShape,
+                    shadowElevation = 0.5.dp
+                ) {
+                    Box(modifier = Modifier.padding(2.dp)) { // Small padding inside bubble
+                        if (progressFraction != null && progressFraction < 1f && isSelf) {
+                            // Cyberpunk block-reveal while sending
+                            BlockRevealImage(
+                                bitmap = img,
+                                progress = progressFraction,
+                                blocksX = 24,
+                                blocksY = 16,
+                                modifier = Modifier
+                                    .widthIn(max = 280.dp)
+                                    .aspectRatio(aspect)
+                                    .clip(bubbleShape)
+                                    .clickable {
+                                        val currentIndex = imagePaths.indexOf(path)
+                                        onImageClick?.invoke(path, imagePaths, currentIndex)
+                                    }
+                            )
+                        } else {
+                            // Fully revealed image
+                            Image(
+                                bitmap = img,
+                                contentDescription = stringResource(com.bluetalk.android.R.string.cd_image),
+                                modifier = Modifier
+                                    .widthIn(max = 280.dp)
+                                    .aspectRatio(aspect)
+                                    .clip(bubbleShape)
+                                    .clickable {
+                                        val currentIndex = imagePaths.indexOf(path)
+                                        onImageClick?.invoke(path, imagePaths, currentIndex)
+                                    },
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                        // Cancel button overlay during sending
+                        val showCancel = isSelf && (message.deliveryStatus is com.bluetalk.android.model.DeliveryStatus.PartiallyDelivered)
+                        if (showCancel) {
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(4.dp)
+                                    .size(22.dp)
+                                    .background(Color.Gray.copy(alpha = 0.6f), CircleShape)
+                                    .clickable { onCancelTransfer?.invoke(message) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(imageVector = Icons.Filled.Close, contentDescription = stringResource(com.bluetalk.android.R.string.cd_cancel), tint = Color.White, modifier = Modifier.size(14.dp))
+                            }
                         }
                     }
                 }
