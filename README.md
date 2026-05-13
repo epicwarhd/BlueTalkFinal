@@ -5,19 +5,19 @@
 > [!WARNING]
 > This software has not received external security review and may contain vulnerabilities and may not necessarily meet its stated security goals. Do not use it for sensitive use cases, and do not rely on its security until it has been reviewed. Work in progress.
 
-# bitchat for Android
+# bluetalk for Android
 
 A secure, decentralized, peer-to-peer messaging app that works over Bluetooth mesh networks. No internet required for mesh chats, no servers, no phone numbers - just pure encrypted communication. Bitchat also supports geohash channels, which use an internet connection to connect you with others in your geographic area.
 
-This is the **Android port** of the original [bitchat iOS app](https://github.com/jackjackbits/bitchat), maintaining 100% protocol compatibility for cross-platform communication.
+This is the **Android port** of the original [bluetalk iOS app](https://github.com/jackjackbits/bluetalk), maintaining 100% protocol compatibility for cross-platform communication.
 
-## Install bitchat
+## Install bluetalk
 
-You can download the latest version of bitchat for Android from the [GitHub Releases page](https://github.com/permissionlesstech/bitchat-android/releases).
+You can download the latest version of bluetalk for Android from the [GitHub Releases page](https://github.com/permissionlesstech/bluetalk-android/releases).
 
 Or you can:
 
-[<img alt="Get it on Google Play" height="60" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"/>](https://play.google.com/store/apps/details?id=com.bitchat.droid)
+[<img alt="Get it on Google Play" height="60" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"/>](https://play.google.com/store/apps/details?id=com.bluetalk.droid)
 
 **Instructions:**
 
@@ -31,7 +31,7 @@ This project is released into the public domain. See the [LICENSE](LICENSE.md) f
 
 ## Features
 
-- **✅ Cross-Platform Compatible**: Full protocol compatibility with iOS bitchat
+- **✅ Cross-Platform Compatible**: Full protocol compatibility with iOS bluetalk
 - **✅ Decentralized Mesh Network**: Automatic peer discovery and multi-hop message relay over Bluetooth LE
 - **✅ End-to-End Encryption**: X25519 key exchange + AES-256-GCM for private messages
 - **✅ Channel-Based Chats**: Topic-based group messaging with optional password protection
@@ -57,14 +57,14 @@ This project is released into the public domain. See the [LICENSE](LICENSE.md) f
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/permissionlesstech/bitchat-android.git
-   cd bitchat-android
+   git clone https://github.com/permissionlesstech/bluetalk-android.git
+   cd bluetalk-android
    ```
 
 2. **Open in Android Studio:**
    ```bash
    # Open Android Studio and select "Open an Existing Project"
-   # Navigate to the bitchat-android directory
+   # Navigate to the bluetalk-android directory
    ```
 
 3. **Build the project:**
@@ -131,9 +131,9 @@ The app requires the following permissions (automatically requested):
 
 1. **Install the app** on your Android device (requires Android 8.0+)
 2. **Grant permissions** for Bluetooth and location when prompted
-3. **Launch bitchat** - it will auto-start mesh networking
+3. **Launch bluetalk** - it will auto-start mesh networking
 4. **Set your nickname** or use the auto-generated one
-5. **Connect automatically** to nearby iOS and Android bitchat users
+5. **Connect automatically** to nearby iOS and Android bluetalk users
 6. **Join a channel** with `/j #general` or start chatting in public
 7. **Messages relay** through the mesh network to reach distant peers
 
@@ -192,7 +192,7 @@ The app requires the following permissions (automatically requested):
 ## Technical Architecture
 
 ### Binary Protocol
-bitchat uses an efficient binary protocol optimized for Bluetooth LE:
+bluetalk uses an efficient binary protocol optimized for Bluetooth LE:
 - Compact packet format with 1-byte type field
 - TTL-based message routing (max 7 hops)
 - Automatic fragmentation for large messages
@@ -279,14 +279,14 @@ The Android implementation maintains 100% binary protocol compatibility with iOS
 
 ## Cross-Platform Communication
 
-This Android port enables seamless communication with the original iOS bitchat app:
+This Android port enables seamless communication with the original iOS bluetalk app:
 
 - **iPhone ↔ Android**: Full bidirectional messaging
 - **Mixed Groups**: iOS and Android users in same channels
 - **Feature Parity**: All commands and encryption work across platforms
 - **Protocol Sync**: Identical message format and routing behavior
 
-**iOS Version**: For iPhone/iPad users, get the original bitchat at [github.com/jackjackbits/bitchat](https://github.com/jackjackbits/bitchat)
+**iOS Version**: For iPhone/iPad users, get the original bluetalk at [github.com/jackjackbits/bluetalk](https://github.com/jackjackbits/bluetalk)
 
 ## Contributing
 
@@ -303,6 +303,6 @@ Contributions are welcome! Key areas for enhancement:
 - **Bug Reports**: [Create an issue](../../issues) with device info and logs
 - **Feature Requests**: [Start a discussion](https://github.com/orgs/permissionlesstech/discussions)
 - **Security Issues**: Email security concerns privately
-- **iOS Compatibility**: Cross-reference with [original iOS repo](https://github.com/jackjackbits/bitchat)
+- **iOS Compatibility**: Cross-reference with [original iOS repo](https://github.com/jackjackbits/bluetalk)
 
-For iOS-specific issues, please refer to the [original iOS bitchat repository](https://github.com/jackjackbits/bitchat).
+For iOS-specific issues, please refer to the [original iOS bluetalk repository](https://github.com/jackjackbits/bluetalk).

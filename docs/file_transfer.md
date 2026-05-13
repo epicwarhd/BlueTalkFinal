@@ -44,9 +44,9 @@ Fields (subset relevant to file transfer):
 
 Envelope creation and broadcast paths are implemented in:
 
-- `app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt)
-- `app/src/main/java/com/bitchat/android/mesh/BluetoothConnectionManager.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/BluetoothConnectionManager.kt)
-- `app/src/main/java/com/bitchat/android/mesh/PacketProcessor.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/PacketProcessor.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/BluetoothConnectionManager.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothConnectionManager.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/PacketProcessor.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/PacketProcessor.kt)
 
 Private sends are additionally encrypted at the higher layer (Noise) for text messages, but file transfers use the `FILE_TRANSFER` message type in the clear at the envelope level with content carried inside a TLV. See code for any deployment‑specific enforcement.
 
@@ -95,7 +95,7 @@ PayloadLength: 4 bytes (big-endian, max ~4 GiB)
 
 The file payload is a TLV structure with mixed length field sizes to support large contents efficiently.
 
-- Defined in `app/src/main/java/com/bitchat/android/model/BitchatFilePacket.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/model/BitchatFilePacket.kt)
+- Defined in `app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt)
 
 Canonical TLVs (v2 spec):
 
@@ -170,10 +170,10 @@ Transfers are cancellable mid‑flight:
 
 Implementation files:
 
-- `app/src/main/java/com/bitchat/android/mesh/BluetoothPacketBroadcaster.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/BluetoothPacketBroadcaster.kt)
-- `app/src/main/java/com/bitchat/android/mesh/BluetoothConnectionManager.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/BluetoothConnectionManager.kt)
-- `app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt)
-- `app/src/main/java/com/bitchat/android/ui/ChatViewModel.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/ChatViewModel.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/BluetoothPacketBroadcaster.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothPacketBroadcaster.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/BluetoothConnectionManager.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothConnectionManager.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt)
+- `app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt)
 
 
 ---
@@ -200,7 +200,7 @@ Receiver dispatch is in `MessageHandler`:
 
 Files:
 
-- `app/src/main/java/com/bitchat/android/mesh/MessageHandler.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/MessageHandler.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/MessageHandler.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/MessageHandler.kt)
 
 
 ---
@@ -238,11 +238,11 @@ Files:
 
 Core files:
 
-- `app/src/main/java/com/bitchat/android/ui/ChatViewModel.kt` (sendVoiceNote) (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/ChatViewModel.kt)
-- `app/src/main/java/com/bitchat/android/model/BitchatFilePacket.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/model/BitchatFilePacket.kt)
-- `app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt)
-- `app/src/main/java/com/bitchat/android/features/voice/VoiceRecorder.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/features/voice/VoiceRecorder.kt)
-- `app/src/main/java/com/bitchat/android/features/voice/Waveform.kt` (cache + extractor) (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/features/voice/Waveform.kt)
+- `app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt` (sendVoiceNote) (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt)
+- `app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt)
+- `app/src/main/java/com/bluetalk/android/features/voice/VoiceRecorder.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/voice/VoiceRecorder.kt)
+- `app/src/main/java/com/bluetalk/android/features/voice/Waveform.kt` (cache + extractor) (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/voice/Waveform.kt)
 
 ### 4.2 Images
 
@@ -263,9 +263,9 @@ Core files:
 
 Core files:
 
-- `app/src/main/java/com/bitchat/android/features/media/ImageUtils.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/features/media/ImageUtils.kt)
-- `app/src/main/java/com/bitchat/android/ui/ChatViewModel.kt` (sendImageNote) (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/ChatViewModel.kt)
-- `app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt)
+- `app/src/main/java/com/bluetalk/android/features/media/ImageUtils.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/media/ImageUtils.kt)
+- `app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt` (sendImageNote) (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt)
 
 
 ---
@@ -282,13 +282,13 @@ This section specifies exactly what users see and how inputs behave, so alternat
 
 Files:
 
-- `app/src/main/java/com/bitchat/android/ui/InputComponents.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/InputComponents.kt)
+- `app/src/main/java/com/bluetalk/android/ui/InputComponents.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/InputComponents.kt)
 
 ### 5.2 Recording UX
 
 - Hold the mic button to start recording. Recording runs until release, then we pad 500 ms and stop.
 - While recording, a dense, real‑time scrolling waveform overlays the input showing live audio; a timer is shown to the right.
-  - Component: `RealtimeScrollingWaveform` (dense bars, ~240 columns, ~20 FPS) in `app/src/main/java/com/bitchat/android/ui/media/RealtimeScrollingWaveform.kt`.
+  - Component: `RealtimeScrollingWaveform` (dense bars, ~240 columns, ~20 FPS) in `app/src/main/java/com/bluetalk/android/ui/media/RealtimeScrollingWaveform.kt`.
   - The keyboard stays visible; the caret is hidden.
 - On release, we immediately show a local echo message for the voice note and start sending.
 
@@ -306,9 +306,9 @@ Files:
 
 Files:
 
-- `app/src/main/java/com/bitchat/android/ui/MessageComponents.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/MessageComponents.kt)
-- `app/src/main/java/com/bitchat/android/ui/media/WaveformViews.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/WaveformViews.kt)
-- `app/src/main/java/com/bitchat/android/features/voice/Waveform.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/features/voice/Waveform.kt)
+- `app/src/main/java/com/bluetalk/android/ui/MessageComponents.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/MessageComponents.kt)
+- `app/src/main/java/com/bluetalk/android/ui/media/WaveformViews.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/WaveformViews.kt)
+- `app/src/main/java/com/bluetalk/android/features/voice/Waveform.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/voice/Waveform.kt)
 
 ### 5.4 Image sending UX
 
@@ -321,10 +321,10 @@ Files:
 
 Files:
 
-- `app/src/main/java/com/bitchat/android/ui/media/ImagePickerButton.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/ImagePickerButton.kt)
-- `app/src/main/java/com/bitchat/android/features/media/ImageUtils.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/features/media/ImageUtils.kt)
-- `app/src/main/java/com/bitchat/android/ui/media/BlockRevealImage.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/BlockRevealImage.kt)
-- `app/src/main/java/com/bitchat/android/ui/MessageComponents.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/MessageComponents.kt)
+- `app/src/main/java/com/bluetalk/android/ui/media/ImagePickerButton.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/ImagePickerButton.kt)
+- `app/src/main/java/com/bluetalk/android/features/media/ImageUtils.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/media/ImageUtils.kt)
+- `app/src/main/java/com/bluetalk/android/ui/media/BlockRevealImage.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/BlockRevealImage.kt)
+- `app/src/main/java/com/bluetalk/android/ui/MessageComponents.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/MessageComponents.kt)
 
 ### 5.5 Image receiving UX
 
@@ -333,7 +333,7 @@ Files:
 
 Files:
 
-- `app/src/main/java/com/bitchat/android/ui/media/FullScreenImageViewer.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/FullScreenImageViewer.kt)
+- `app/src/main/java/com/bluetalk/android/ui/media/FullScreenImageViewer.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/FullScreenImageViewer.kt)
 
 
 ---
@@ -362,8 +362,8 @@ VoiceNotePlayer Seeking:
 - Updates progress state immediately for UI responsiveness even before playback reaches the new position.
 
 Files:
-- `app/src/main/java/com/bitchat/android/ui/MessageComponents.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/MessageComponents.kt) — VoiceNotePlayer with seekTo function
-- `app/src/main/java/com/bitchat/android/ui/media/WaveformViews.kt` (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/WaveformViews.kt) — Interactive WaveformCanvas with tap handling
+- `app/src/main/java/com/bluetalk/android/ui/MessageComponents.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/MessageComponents.kt) — VoiceNotePlayer with seekTo function
+- `app/src/main/java/com/bluetalk/android/ui/media/WaveformViews.kt` (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/WaveformViews.kt) — Interactive WaveformCanvas with tap handling
 
 ---
 
@@ -383,38 +383,38 @@ Files:
 
 Core protocol and transport:
 
-- `app/src/main/java/com/bitchat/android/model/BitchatFilePacket.kt` — TLV payload model + encode/decode. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/model/BitchatFilePacket.kt)
-- `app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt` — packet creation and broadcast for file messages. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/BluetoothMeshService.kt)
-- `app/src/main/java/com/bitchat/android/mesh/BluetoothPacketBroadcaster.kt` — fragmentation, progress, cancellation via transfer jobs. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/BluetoothPacketBroadcaster.kt)
-- `app/src/main/java/com/bitchat/android/mesh/TransferProgressManager.kt` — progress events bus. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/TransferProgressManager.kt)
-- `app/src/main/java/com/bitchat/android/mesh/MessageHandler.kt` — receive path: decode, persist to files, create chat messages. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/mesh/MessageHandler.kt)
+- `app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt` — TLV payload model + encode/decode. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/model/BitchatFilePacket.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt` — packet creation and broadcast for file messages. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothMeshService.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/BluetoothPacketBroadcaster.kt` — fragmentation, progress, cancellation via transfer jobs. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/BluetoothPacketBroadcaster.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/TransferProgressManager.kt` — progress events bus. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/TransferProgressManager.kt)
+- `app/src/main/java/com/bluetalk/android/mesh/MessageHandler.kt` — receive path: decode, persist to files, create chat messages. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/mesh/MessageHandler.kt)
 
 Audio capture and waveform:
 
-- `app/src/main/java/com/bitchat/android/features/voice/VoiceRecorder.kt` — MediaRecorder wrapper. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/features/voice/VoiceRecorder.kt)
-- `app/src/main/java/com/bitchat/android/features/voice/Waveform.kt` — cache + extractor + resampler. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/features/voice/Waveform.kt)
-- `app/src/main/java/com/bitchat/android/ui/media/WaveformViews.kt` — Compose waveform preview components. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/WaveformViews.kt)
+- `app/src/main/java/com/bluetalk/android/features/voice/VoiceRecorder.kt` — MediaRecorder wrapper. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/voice/VoiceRecorder.kt)
+- `app/src/main/java/com/bluetalk/android/features/voice/Waveform.kt` — cache + extractor + resampler. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/voice/Waveform.kt)
+- `app/src/main/java/com/bluetalk/android/ui/media/WaveformViews.kt` — Compose waveform preview components. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/WaveformViews.kt)
 
 Image pipeline:
 
-- `app/src/main/java/com/bitchat/android/features/media/ImageUtils.kt` — downscale and save to app files. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/features/media/ImageUtils.kt)
-- `app/src/main/java/com/bitchat/android/ui/media/ImagePickerButton.kt` — SAF picker button. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/ImagePickerButton.kt)
-- `app/src/main/java/com/bitchat/android/ui/media/BlockRevealImage.kt` — block‑reveal progress renderer (no gaps, dense grid). (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/BlockRevealImage.kt)
+- `app/src/main/java/com/bluetalk/android/features/media/ImageUtils.kt` — downscale and save to app files. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/features/media/ImageUtils.kt)
+- `app/src/main/java/com/bluetalk/android/ui/media/ImagePickerButton.kt` — SAF picker button. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/ImagePickerButton.kt)
+- `app/src/main/java/com/bluetalk/android/ui/media/BlockRevealImage.kt` — block‑reveal progress renderer (no gaps, dense grid). (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/BlockRevealImage.kt)
 
 Recording overlay:
 
-- `app/src/main/java/com/bitchat/android/ui/media/RealtimeScrollingWaveform.kt` — dense, real‑time scrolling waveform during recording. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/RealtimeScrollingWaveform.kt)
+- `app/src/main/java/com/bluetalk/android/ui/media/RealtimeScrollingWaveform.kt` — dense, real‑time scrolling waveform during recording. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/RealtimeScrollingWaveform.kt)
 
 UI composition and view model coordination:
 
-- `app/src/main/java/com/bitchat/android/ui/InputComponents.kt` — input field, overlays (recording), picker button, mic. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/InputComponents.kt)
-- `app/src/main/java/com/bitchat/android/ui/MessageComponents.kt` — message rendering for text/audio/images including progress UIs and cancel overlays. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/MessageComponents.kt)
-- `app/src/main/java/com/bitchat/android/ui/ChatViewModel.kt` — sendVoiceNote/sendImageNote, progress mapping, cancelMediaSend. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/ChatViewModel.kt)
-- `app/src/main/java/com/bitchat/android/ui/MessageManager.kt` — add/remove/update messages across main, private, and channels. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/MessageManager.kt)
+- `app/src/main/java/com/bluetalk/android/ui/InputComponents.kt` — input field, overlays (recording), picker button, mic. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/InputComponents.kt)
+- `app/src/main/java/com/bluetalk/android/ui/MessageComponents.kt` — message rendering for text/audio/images including progress UIs and cancel overlays. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/MessageComponents.kt)
+- `app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt` — sendVoiceNote/sendImageNote, progress mapping, cancelMediaSend. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/ChatViewModel.kt)
+- `app/src/main/java/com/bluetalk/android/ui/MessageManager.kt` — add/remove/update messages across main, private, and channels. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/MessageManager.kt)
 
 Fullscreen image:
 
-- `app/src/main/java/com/bitchat/android/ui/media/FullScreenImageViewer.kt` — fullscreen viewer + save to Downloads. (/Users/cc/git/bitchat-android/app/src/main/java/com/bitchat/android/ui/media/FullScreenImageViewer.kt)
+- `app/src/main/java/com/bluetalk/android/ui/media/FullScreenImageViewer.kt` — fullscreen viewer + save to Downloads. (/Users/cc/git/bluetalk-android/app/src/main/java/com/bluetalk/android/ui/media/FullScreenImageViewer.kt)
 
 
 ---

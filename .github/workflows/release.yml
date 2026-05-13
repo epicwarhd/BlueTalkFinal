@@ -49,9 +49,9 @@ jobs:
       - name: Rename APKs for GitHub Release
         run: |
           cd app/build/outputs/apk/release
-          [ -f "app-arm64-v8a-release-unsigned.apk" ] && mv app-arm64-v8a-release-unsigned.apk bitchat-android-arm64.apk
-          [ -f "app-x86_64-release-unsigned.apk" ] && mv app-x86_64-release-unsigned.apk bitchat-android-x86_64.apk
-          [ -f "app-universal-release-unsigned.apk" ] && mv app-universal-release-unsigned.apk bitchat-android-universal.apk
+          [ -f "app-arm64-v8a-release-unsigned.apk" ] && mv app-arm64-v8a-release-unsigned.apk bluetalk-android-arm64.apk
+          [ -f "app-x86_64-release-unsigned.apk" ] && mv app-x86_64-release-unsigned.apk bluetalk-android-x86_64.apk
+          [ -f "app-universal-release-unsigned.apk" ] && mv app-universal-release-unsigned.apk bluetalk-android-universal.apk
 
       - name: DEBUG
         run: |
@@ -75,7 +75,7 @@ jobs:
       - name: Upload APKs as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bitchat-android-release-${{ github.ref_name }}
+          name: bluetalk-android-release-${{ github.ref_name }}
           path: app/build/outputs/apk/release/*.apk
           retention-days: 30
           if-no-files-found: error
@@ -88,20 +88,20 @@ jobs:
       - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
-          name: bitchat-android-release-${{ github.ref_name }}
+          name: bluetalk-android-release-${{ github.ref_name }}
           path: release
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            release/bitchat-android-arm64.apk
-            release/bitchat-android-x86_64.apk
-            release/bitchat-android-universal.apk
+            release/bluetalk-android-arm64.apk
+            release/bluetalk-android-x86_64.apk
+            release/bluetalk-android-universal.apk
           name: Release ${{ github.ref_name }}
           body: |
-            **bitchat-android-arm64.apk** - ARM64 (most phones)
-            **bitchat-android-x86_64.apk** - x86_64 (Chromebooks, tablets)
-            **bitchat-android-universal.apk** - All architectures (fallback)
+            **bluetalk-android-arm64.apk** - ARM64 (most phones)
+            **bluetalk-android-x86_64.apk** - x86_64 (Chromebooks, tablets)
+            **bluetalk-android-universal.apk** - All architectures (fallback)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
