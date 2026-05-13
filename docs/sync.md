@@ -22,11 +22,11 @@ To compare packets across peers, a deterministic packet ID is used:
 - ID = first 16 bytes of SHA-256 over: [type | senderID | timestamp | payload]
 - This yields a 128-bit ID used in the filter.
 
-Implementation: `com.bitchat.android.sync.PacketIdUtil`.
+Implementation: `com.bluetalk.android.sync.PacketIdUtil`.
 
 ## GCS Filter (On-demand)
 
-Implementation: `com.bitchat.android.sync.GCSFilter`.
+Implementation: `com.bluetalk.android.sync.GCSFilter`.
 
 - Parameters (configurable):
   - size: 128–1024 bytes (default 256)
@@ -61,7 +61,7 @@ Notes:
 - The GCS bitstream uses MSB‑first packing (bit 7 is the first bit in each byte).
 - Receivers MUST reject filters with data length exceeding the local maximum (default 1024 bytes) to avoid DoS.
 
-Encode/Decode implementation: `com.bitchat.android.model.RequestSyncPacket`.
+Encode/Decode implementation: `com.bluetalk.android.model.RequestSyncPacket`.
 
 ## Behavior
 

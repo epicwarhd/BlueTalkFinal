@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.bitchat.android"
+    namespace = "com.bluetalk.android"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.bitchat.droid"
+        applicationId = "com.bluetalk.android"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 33
