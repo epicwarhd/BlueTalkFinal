@@ -67,7 +67,7 @@ fun AudioMessageItem(
         var headerLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
         Text(
             text = headerText,
-            fontFamily = FontFamily.Monospace,
+             fontFamily = FontFamily.SansSerif,
             color = colorScheme.onSurface,
             modifier = Modifier
                 .align(if (isSelf) Alignment.End else Alignment.Start)

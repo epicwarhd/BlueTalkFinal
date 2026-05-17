@@ -34,16 +34,17 @@ val Typography = Typography(
     ),
     headlineSmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = (BASE_FONT_SIZE + 4).sp,
-        lineHeight = (BASE_FONT_SIZE + 10).sp
+        fontWeight = FontWeight.Bold,
+        fontSize = (BASE_FONT_SIZE + 6).sp,
+        lineHeight = (BASE_FONT_SIZE + 12).sp,
+        letterSpacing = (-0.5).sp
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
         fontSize = (BASE_FONT_SIZE + 2).sp,
         lineHeight = (BASE_FONT_SIZE + 8).sp,
-        letterSpacing = 0.15.sp
+        letterSpacing = 0.1.sp
     ),
     labelMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,

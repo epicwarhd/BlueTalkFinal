@@ -114,7 +114,7 @@ fun MessageWithMatrixAnimation(
         Text(
             text = annotatedText,
             modifier = modifier,
-            fontFamily = FontFamily.Monospace,
+            fontFamily = FontFamily.SansSerif,
             softWrap = true
         )
     }
@@ -243,7 +243,7 @@ private fun AnimatedMessageDisplay(
         Text(
             text = annotatedText,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            fontFamily = FontFamily.Monospace,
+            fontFamily = FontFamily.SansSerif,
             softWrap = true,
             overflow = androidx.compose.ui.text.style.TextOverflow.Visible,
             style = androidx.compose.ui.text.TextStyle(

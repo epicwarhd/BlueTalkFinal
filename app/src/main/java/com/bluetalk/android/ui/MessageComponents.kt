@@ -281,7 +281,7 @@ fun MessageItem(
             var headerLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
             Text(
                 text = headerText,
-                fontFamily = FontFamily.Monospace,
+                fontFamily = FontFamily.SansSerif,
                 color = colorScheme.onSurface,
                 modifier = Modifier
                     .align(if (isSelf) Alignment.End else Alignment.Start)
@@ -365,7 +365,7 @@ fun MessageItem(
                                 }
                             }
                         } else {
-                            Text(text = stringResource(R.string.file_unavailable), fontFamily = FontFamily.Monospace, color = Color.Gray)
+                            Text(text = stringResource(R.string.file_unavailable), fontFamily = FontFamily.SansSerif, color = Color.Gray)
                         }
                     }
                 }
@@ -495,7 +495,7 @@ fun MessageItem(
                             }
                         )
                     },
-                fontFamily = FontFamily.Monospace,
+                fontFamily = FontFamily.SansSerif,
                 softWrap = true,
                 overflow = TextOverflow.Visible,
                 style = androidx.compose.ui.text.TextStyle(
