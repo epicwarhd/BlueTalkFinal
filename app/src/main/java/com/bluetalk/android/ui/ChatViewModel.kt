@@ -33,65 +33,37 @@ import com.bluetalk.android.util.hexEncodedString
 import java.security.MessageDigest
 
 /**
- * Refactored ChatViewModel - Main coordinator for bluetalk functionality
- * Delegates specific responsibilities to specialized managers while maintaining 100% iOS compatibility
+ * ChatViewModel - Người điều phối chính cho mọi chức năng của BlueTalk.
+ * Lớp này quản lý trạng thái giao diện, kết nối các dịch vụ chuyên biệt (Mesh, Geohash, Media)
+ * và đảm bảo tính tương thích 100% với các phiên bản khác.
  */
 class ChatViewModel(
     application: Application,
     initialMeshService: BluetoothMeshService
 ) : AndroidViewModel(application), BluetoothMeshDelegate {
 
-    // Made var to support mesh service replacement after panic clear
+    // Dịch vụ Mesh Bluetooth - có thể thay đổi nếu người dùng thực hiện xóa dữ liệu khẩn cấp.
     var meshService: BluetoothMeshService = initialMeshService
         private set
+
     private val debugManager by lazy { try { com.bluetalk.android.ui.debug.DebugSettingsManager.getInstance() } catch (e: Exception) { null } }
 
     companion object {
         private const val TAG = "ChatViewModel"
     }
 
-    fun sendVoiceNote(toPeerIDOrNull: String?, channelOrNull: String?, filePath: String) {
-        mediaSendingManager.sendVoiceNote(toPeerIDOrNull, channelOrNull, filePath)
-    }
-
-    fun sendFileNote(toPeerIDOrNull: String?, channelOrNull: String?, filePath: String) {
-        mediaSendingManager.sendFileNote(toPeerIDOrNull, channelOrNull, filePath)
-    }
-
-    fun sendImageNote(toPeerIDOrNull: String?, channelOrNull: String?, filePath: String) {
-        mediaSendingManager.sendImageNote(toPeerIDOrNull, channelOrNull, filePath)
-    }
-
-    fun getCurrentNpub(): String? {
-        return try {
-            NostrIdentityBridge
-                .getCurrentNostrIdentity(getApplication())
-                ?.npub
-        } catch (_: Exception) {
-            null
-        }
-    }
-
-    fun buildMyQRString(nickname: String, npub: String?): String {
-        return VerificationService.buildMyQRString(nickname, npub) ?: ""
-    }
-
-    // MARK: - State management
+    // MARK: - Quản lý trạng thái (State management)
     private val state = ChatState(
         scope = viewModelScope,
     )
 
-    // Transfer progress tracking
-    private val transferMessageMap = mutableMapOf<String, String>()
-    private val messageTransferMap = mutableMapOf<String, String>()
-
-    // Specialized managers
+    // Các trình quản lý chuyên biệt xử lý từng mảng logic riêng.
     private val dataManager = DataManager(application.applicationContext)
     private val identityManager by lazy { SecureIdentityStateManager(getApplication()) }
     private val messageManager = MessageManager(state)
     private val channelManager = ChannelManager(state, messageManager, dataManager, viewModelScope)
 
-    // Create Noise session delegate for clean dependency injection
+    // Cài đặt xử lý bảo mật cho giao thức Noise (mã hóa tin nhắn riêng tư).
     private val noiseSessionDelegate = object : NoiseSessionDelegate {
         override fun hasEstablishedSession(peerID: String): Boolean = meshService.hasEstablishedSession(peerID)
         override fun initiateHandshake(peerID: String) = meshService.initiateNoiseHandshake(peerID)

@@ -79,7 +79,7 @@ class MainActivity : OrientationAwareActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Register receiver for force finish signal from shutdown coordinator
+        // Đăng ký bộ thu để đóng ứng dụng khi nhận tín hiệu "Buộc kết thúc" (Force Finish) từ hệ thống gỡ lỗi hoặc tắt máy.
         val filter = android.content.IntentFilter(com.bluetalk.android.util.AppConstants.UI.ACTION_FORCE_FINISH)
         if (android.os.Build.VERSION.SDK_INT >= 33) {
             registerReceiver(
@@ -99,7 +99,7 @@ class MainActivity : OrientationAwareActivity() {
             )
         }
         
-        // Check if this is a quit request from the notification
+        // Kiểm tra xem đây có phải là yêu cầu thoát ứng dụng từ thanh thông báo hay không.
         if (intent.getBooleanExtra("ACTION_QUIT_APP", false)) {
             android.util.Log.d("MainActivity", "Quit request received in onCreate, finishing activity")
             finish()
@@ -108,14 +108,17 @@ class MainActivity : OrientationAwareActivity() {
 
         com.bluetalk.android.service.AppShutdownCoordinator.cancelPendingShutdown()
         
-        // Enable edge-to-edge display for modern Android look
+        // Bật tính năng hiển thị tràn viền (Edge-to-edge) cho giao diện hiện đại.
         enableEdgeToEdge()
 
-        // Initialize permission management
+        // Khởi tạo trình quản lý quyền truy cập (Permissions).
         permissionManager = PermissionManager(this)
-        // Ensure foreground service is running and get mesh instance from holder
+        
+        // Đảm bảo dịch vụ nền Mesh đang chạy và lấy đối tượng meshService từ bộ lưu trữ trung tâm.
         try { com.bluetalk.android.service.MeshForegroundService.start(applicationContext) } catch (_: Exception) { }
         meshService = com.bluetalk.android.service.MeshServiceHolder.getOrCreate(applicationContext)
+        
+        // Khởi tạo các trình quản lý trạng thái phần cứng (Bluetooth, Vị trí, Pin).
         bluetoothStatusManager = BluetoothStatusManager(
             activity = this,
             context = this,
@@ -134,6 +137,8 @@ class MainActivity : OrientationAwareActivity() {
             onBatteryOptimizationDisabled = ::handleBatteryOptimizationDisabled,
             onBatteryOptimizationFailed = ::handleBatteryOptimizationFailed
         )
+        
+        // Điều phối luồng hướng dẫn người dùng mới (Onboarding).
         onboardingCoordinator = OnboardingCoordinator(
             activity = this,
             permissionManager = permissionManager,
@@ -144,12 +149,14 @@ class MainActivity : OrientationAwareActivity() {
             onOnboardingFailed = ::handleOnboardingFailed
         )
         
+        // Thiết lập giao diện chính bằng Jetpack Compose.
         setContent {
             BlueTalkTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = MaterialTheme.colorScheme.background
                 ) { innerPadding ->
+                    // Hiển thị màn hình tương ứng với trạng thái Onboarding hiện tại.
                     OnboardingFlowScreen(modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)

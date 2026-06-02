@@ -18,11 +18,11 @@ import java.util.concurrent.ConcurrentHashMap
 import androidx.core.content.edit
 
 /**
- * Encryption service that now uses NoiseEncryptionService internally
- * Maintains the same public API for backward compatibility
- * 
- * This is the main interface for all encryption/decryption operations in bluetalk.
- * It now uses the Noise protocol for secure transport encryption with proper session management.
+ * EncryptionService: Dịch vụ mã hóa cốt lõi của ứng dụng.
+ * Lớp này quản lý các hoạt động bảo mật bao gồm:
+ * 1. Tạo và lưu trữ cặp khóa định danh (Ed25519) để ký tên tin nhắn.
+ * 2. Triển khai giao thức Noise để mã hóa đầu cuối (E2EE) cho các cuộc trò chuyện riêng tư.
+ * 3. Quản lý lưu trữ an toàn các thông tin nhạy cảm.
  */
 open class EncryptionService(private val context: Context) {
     
@@ -33,92 +33,42 @@ open class EncryptionService(private val context: Context) {
         private const val SECURE_PREFS_NAME = "bluetalk_crypto_secure"
     }
     
-    // Core Noise encryption service
+    // NoiseEncryptionService: Xử lý các chi tiết kỹ thuật của giao thức Noise (mã hóa kênh truyền).
     private val noiseService: NoiseEncryptionService by lazy { NoiseEncryptionService(context) }
     
-    // Session tracking for established connections
+    // Theo dõi các phiên kết nối đã được thiết lập thành công.
     private val establishedSessions = ConcurrentHashMap<String, String>() // peerID -> fingerprint
     
-    // Ed25519 signing keys (separate from Noise static keys)
+    // Cặp khóa Ed25519 dùng để tạo chữ ký số (Digital Signature).
     private lateinit var ed25519PrivateKey: Ed25519PrivateKeyParameters
     private lateinit var ed25519PublicKey: Ed25519PublicKeyParameters
     
-    // Callbacks for UI state updates
-    var onSessionEstablished: ((String) -> Unit)? = null // peerID
-    var onSessionLost: ((String) -> Unit)? = null // peerID
-    var onHandshakeRequired: ((String) -> Unit)? = null // peerID
-    private lateinit var prefs: SharedPreferences
-    
-    init {
-        initialize()
-    }
-
-    private fun setUpEncryptedPrefs() {
-        val masterKey = MasterKey.Builder(context, MasterKey.DEFAULT_MASTER_KEY_ALIAS)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
-
-        // Create encrypted shared preferences
-        prefs = EncryptedSharedPreferences.create(
-            context,
-            SECURE_PREFS_NAME,
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-    }
-
     /**
-     * Initialization logic moved to method to allow overriding in tests
+     * Hàm mã hóa dữ liệu dành cho một người nhận cụ thể (Sử dụng Noise protocol).
      */
-    protected open fun initialize() {
-        setUpEncryptedPrefs()
-        // Initialize or load Ed25519 signing keys
-        val keyPair = loadOrCreateEd25519KeyPair()
-        ed25519PrivateKey = keyPair.private as Ed25519PrivateKeyParameters
-        ed25519PublicKey = keyPair.public as Ed25519PublicKeyParameters
-        
-        Log.d(TAG, "✅ Ed25519 signing keys initialized")
-        
-        // Set up NoiseEncryptionService callbacks
-        noiseService.onPeerAuthenticated = { peerID, fingerprint ->
-            Log.d(TAG, "✅ Noise session established with $peerID, fingerprint: ${fingerprint.take(16)}...")
-            establishedSessions[peerID] = fingerprint
-            onSessionEstablished?.invoke(peerID)
+    @Throws(Exception::class)
+    fun encrypt(data: ByteArray, peerID: String): ByteArray {
+        val encrypted = noiseService.encrypt(data, peerID)
+        if (encrypted == null) {
+            throw Exception("Failed to encrypt for $peerID")
         }
-        
-        noiseService.onHandshakeRequired = { peerID ->
-            Log.d(TAG, "🤝 Handshake required for $peerID")
-            onHandshakeRequired?.invoke(peerID)
+        return encrypted
+    }
+    
+    /**
+     * Hàm giải mã dữ liệu từ một người gửi cụ thể.
+     */
+    @Throws(Exception::class)
+    fun decrypt(data: ByteArray, peerID: String): ByteArray {
+        val decrypted = noiseService.decrypt(data, peerID)
+        if (decrypted == null) {
+            throw Exception("Failed to decrypt from $peerID")
         }
-    }
-    
-    // MARK: - Public API (Maintains backward compatibility)
-    
-    /**
-     * Get our static public key data (32 bytes for Noise)
-     * This replaces the old 96-byte combined key format
-     */
-    fun getCombinedPublicKeyData(): ByteArray {
-        return noiseService.getStaticPublicKeyData()
+        return decrypted
     }
     
     /**
-     * Get our static public key for Noise protocol (for identity announcements)
-     */
-    fun getStaticPublicKey(): ByteArray? {
-        return noiseService.getStaticPublicKeyData()
-    }
-    
-    /**
-     * Get our signing public key for Ed25519 signatures (for identity announcements)
-     */
-    fun getSigningPublicKey(): ByteArray? {
-        return ed25519PublicKey.encoded
-    }
-    
-    /**
-     * Sign data using our Ed25519 signing key (for identity announcements)
+     * Hàm ký tên vào dữ liệu bằng khóa bí mật Ed25519.
      */
     fun signData(data: ByteArray): ByteArray? {
         return try {
@@ -134,15 +84,63 @@ open class EncryptionService(private val context: Context) {
         }
     }
     
+    // Các hàm phản hồi cho giao diện người dùng.
+    var onSessionEstablished: ((String) -> Unit)? = null // peerID
+    var onSessionLost: ((String) -> Unit)? = null // peerID
+    var onHandshakeRequired: ((String) -> Unit)? = null // peerID
+    private lateinit var prefs: SharedPreferences
+    
+    init {
+        initialize()
+    }
+
+    private fun setUpEncryptedPrefs() {
+        val masterKey = MasterKey.Builder(context, MasterKey.DEFAULT_MASTER_KEY_ALIAS)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        // Tạo bộ nhớ tùy chọn được mã hóa (EncryptedSharedPreferences) để lưu trữ khóa bí mật.
+        prefs = EncryptedSharedPreferences.create(
+            context,
+            SECURE_PREFS_NAME,
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+
     /**
-     * Add peer's public key and start handshake if needed
-     * For backward compatibility with old key exchange packets
+     * Logic khởi tạo hệ thống mã hóa.
+     */
+    protected open fun initialize() {
+        setUpEncryptedPrefs()
+        // Khởi tạo hoặc tải cặp khóa ký tên Ed25519 từ bộ nhớ.
+        val keyPair = loadOrCreateEd25519KeyPair()
+        ed25519PrivateKey = keyPair.private as Ed25519PrivateKeyParameters
+        ed25519PublicKey = keyPair.public as Ed25519PublicKeyParameters
+        
+        Log.d(TAG, "✅ Ed25519 signing keys initialized")
+        
+        // Thiết lập các hàm gọi ngược (callback) cho NoiseEncryptionService.
+        noiseService.onPeerAuthenticated = { peerID, fingerprint ->
+            Log.d(TAG, "✅ Noise session established with $peerID, fingerprint: ${fingerprint.take(16)}...")
+            establishedSessions[peerID] = fingerprint
+            onSessionEstablished?.invoke(peerID)
+        }
+        
+        noiseService.onHandshakeRequired = { peerID ->
+            Log.d(TAG, "🤝 Handshake required for $peerID")
+            onHandshakeRequired?.invoke(peerID)
+        }
+    }
+    
+    /**
+     * Thêm khóa công khai của người dùng khác và bắt đầu bắt tay bảo mật (Handshake).
      */
     @Throws(Exception::class)
     fun addPeerPublicKey(peerID: String, publicKeyData: ByteArray) {
         Log.d(TAG, "Legacy addPeerPublicKey called for $peerID with ${publicKeyData.size} bytes")
         
-        // If this is from old key exchange format, initiate new Noise handshake
         if (!hasEstablishedSession(peerID)) {
             Log.d(TAG, "No Noise session with $peerID, initiating handshake")
             initiateHandshake(peerID)

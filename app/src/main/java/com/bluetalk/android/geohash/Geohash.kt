@@ -1,24 +1,21 @@
 package com.bluetalk.android.geohash
 
 /**
- * Lightweight Geohash encoder used for Location Channels.
- * Encodes latitude/longitude to base32 geohash with a fixed precision.
- * 
- * Port of iOS implementation for 100% compatibility
+ * Geohash: Bộ mã hóa và giải mã vị trí địa lý.
+ * Chuyển đổi Kinh độ/Vĩ độ thành một chuỗi ký tự Base32 để tạo ra các "ô lưới" bản đồ.
+ * Điều này cho phép nhóm người dùng vào các phòng chat dựa trên vị trí mà không cần máy chủ.
  */
 object Geohash {
     
+    // Bảng ký tự Base32 tiêu chuẩn (không chứa i, l, o, u để tránh nhầm lẫn).
     private val base32Chars = "0123456789bcdefghjkmnpqrstuvwxyz".toCharArray()
     private val charToValue: Map<Char, Int> = base32Chars.withIndex().associate { it.value to it.index }
 
     data class Bounds(val latMin: Double, val latMax: Double, val lonMin: Double, val lonMax: Double)
 
     /**
-     * Encodes the provided coordinates into a geohash string.
-     * @param latitude Latitude in degrees (-90...90)
-     * @param longitude Longitude in degrees (-180...180)
-     * @param precision Number of geohash characters (2-12 typical). Values <= 0 return an empty string.
-     * @return Base32 geohash string of length `precision`.
+     * Mã hóa tọa độ thành chuỗi Geohash.
+     * @param precision Độ chính xác (Độ dài chuỗi). Ví dụ: 5 là cấp thành phố, 6 là cấp phường.
      */
     fun encode(latitude: Double, longitude: Double, precision: Int): String {
         if (precision <= 0) return ""
@@ -36,6 +33,7 @@ object Geohash {
 
         while (geohash.length < precision) {
             if (isEven) {
+                // Chia đôi khoảng Kinh độ (Longitude).
                 val mid = (lonInterval.first + lonInterval.second) / 2
                 if (lon >= mid) {
                     ch = ch or (1 shl (4 - bit))
@@ -44,6 +42,7 @@ object Geohash {
                     lonInterval = lonInterval.first to mid
                 }
             } else {
+                // Chia đôi khoảng Vĩ độ (Latitude).
                 val mid = (latInterval.first + latInterval.second) / 2
                 if (lat >= mid) {
                     ch = ch or (1 shl (4 - bit))
@@ -57,6 +56,7 @@ object Geohash {
             if (bit < 4) {
                 bit += 1
             } else {
+                // Đã đủ 5 bit, tạo thành 1 ký tự và bắt đầu chu kỳ mới.
                 geohash.append(base32Chars[ch])
                 bit = 0
                 ch = 0

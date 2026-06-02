@@ -22,38 +22,47 @@ import kotlin.math.sign
 import kotlin.random.Random
 
 /**
- * Bluetooth mesh service - REFACTORED to use component-based architecture
- * 100% compatible with iOS version and maintains exact same UUIDs, packet format, and protocol logic
- * 
- * This is now a coordinator that orchestrates the following components:
- * - PeerManager: Peer lifecycle management
- * - FragmentManager: Message fragmentation and reassembly  
- * - SecurityManager: Security, duplicate detection, encryption
- * - StoreForwardManager: Offline message caching
- * - MessageHandler: Message type processing and relay logic
- * - BluetoothConnectionManager: BLE connections and GATT operations
- * - PacketProcessor: Incoming packet routing
+ * BluetoothMeshService: Trái tim của hệ thống liên lạc ngoại tuyến (Mesh).
+ * Lớp này điều phối tất cả các thành phần để tạo thành một mạng lưới giao tiếp
+ * thông qua sóng Bluetooth Low Energy (BLE) mà không cần máy chủ trung tâm.
  */
 class BluetoothMeshService(private val context: Context) {
     private val debugManager by lazy { try { com.bluetalk.android.ui.debug.DebugSettingsManager.getInstance() } catch (e: Exception) { null } }
     
     companion object {
         private const val TAG = "BluetoothMeshService"
+        // TTL (Time To Live): Số bước nhảy tối đa của một gói tin trong mạng mesh (mặc định là 7).
         private val MAX_TTL: UByte = com.bluetalk.android.util.AppConstants.MESSAGE_TTL_HOPS
     }
     
-    // Core components - each handling specific responsibilities
+    // Các thành phần cốt lõi xử lý từng mảng kỹ thuật riêng biệt.
     private val encryptionService = EncryptionService(context)
 
-    // My peer identification - derived from persisted Noise identity fingerprint (first 16 hex chars)
+    // ID định danh của tôi trong mạng Mesh (16 ký tự đầu của dấu vân tay số).
     val myPeerID: String = encryptionService.getIdentityFingerprint().take(16)
+    
+    // PeerManager: Quản lý vòng đời và danh sách các thiết bị (peer) xung quanh.
     private val peerManager = PeerManager()
+    
+    // FragmentManager: Chia nhỏ các tin nhắn lớn (như ảnh) và lắp ghép lại khi nhận đủ.
     private val fragmentManager = FragmentManager()
+    
+    // SecurityManager: Xử lý bảo mật, xác thực chữ ký và phát hiện tin nhắn trùng lặp.
     private val securityManager = SecurityManager(encryptionService, myPeerID)
+    
+    // StoreForwardManager: Lưu trữ tin nhắn khi người nhận đang ngoại tuyến và gửi lại khi họ online.
     private val storeForwardManager = StoreForwardManager()
+    
+    // MessageHandler: Xử lý nội dung tin nhắn và logic chuyển tiếp (relay).
     private val messageHandler = MessageHandler(myPeerID, context.applicationContext)
-    internal val connectionManager = BluetoothConnectionManager(context, myPeerID, fragmentManager) // Made internal for access
+    
+    // BluetoothConnectionManager: Trực tiếp điều khiển phần cứng Bluetooth để quét và kết nối.
+    internal val connectionManager = BluetoothConnectionManager(context, myPeerID, fragmentManager)
+    
+    // PacketProcessor: Tiếp nhận và phân loại các gói tin đi vào.
     private val packetProcessor = PacketProcessor(myPeerID)
+    
+    // GossipSyncManager: Đảm bảo các tin nhắn công khai được đồng bộ đều khắp mạng lưới.
     private lateinit var gossipSyncManager: GossipSyncManager
     // Service-level notification manager for background (no-UI) DMs
     private val serviceNotificationManager = com.bluetalk.android.ui.NotificationManager(

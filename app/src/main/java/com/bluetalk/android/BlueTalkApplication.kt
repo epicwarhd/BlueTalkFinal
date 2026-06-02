@@ -6,53 +6,55 @@ import com.bluetalk.android.ui.theme.ThemePreferenceManager
 import com.bluetalk.android.net.ArtiTorManager
 
 /**
- * Main application class for bluetalk Android
+ * BlueTalkApplication: Điểm khởi đầu của ứng dụng (Application class).
+ * Lớp này chịu trách nhiệm khởi tạo các dịch vụ nền quan trọng ngay khi app vừa mở.
  */
 class BlueTalkApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
 
-        // Initialize Tor first so any early network goes over Tor
+        // Khởi tạo mạng Tor (Arti) đầu tiên để đảm bảo mọi kết nối Internet sau đó đều được bảo mật/ẩn danh.
         try {
             val torProvider = ArtiTorManager.getInstance()
             torProvider.init(this)
         } catch (_: Exception){}
 
-        // Initialize relay directory (loads assets/nostr_relays.csv)
+        // Tải danh sách các máy chủ Nostr (Relay) từ tệp assets/nostr_relays.csv.
         RelayDirectory.initialize(this)
 
-        // Initialize LocationNotesManager dependencies early so sheet subscriptions can start immediately
+        // Khởi tạo trình quản lý ghi chú theo vị trí (Location Notes) sớm để người dùng có thể xem ngay.
         try { com.bluetalk.android.nostr.LocationNotesInitializer.initialize(this) } catch (_: Exception) { }
 
-        // Initialize favorites persistence early so MessageRouter/NostrTransport can use it on startup
+        // Khởi tạo lưu trữ "Người dùng yêu thích" (Favorites) để có thể nhận dạng bạn bè ngay khi khởi động.
         try {
             com.bluetalk.android.favorites.FavoritesPersistenceService.initialize(this)
         } catch (_: Exception) { }
 
-        // Warm up Nostr identity to ensure npub is available for favorite notifications
+        // Khởi tạo định danh Nostr (Cặp khóa công khai/bí mật) của người dùng.
         try {
             com.bluetalk.android.nostr.NostrIdentityBridge.getCurrentNostrIdentity(this)
         } catch (_: Exception) { }
 
-        // Initialize theme preference
+        // Khởi tạo tùy chỉnh giao diện (Sáng/Tối) từ bộ nhớ.
         ThemePreferenceManager.init(this)
 
-        // Initialize debug preference manager (persists debug toggles)
+        // Khởi tạo trình quản lý cài đặt gỡ lỗi (Debug settings).
         try { com.bluetalk.android.ui.debug.DebugPreferenceManager.init(this) } catch (_: Exception) { }
 
-        // Initialize Geohash Registries for persistence
+        // Khởi tạo các thanh đăng ký Geohash để theo dõi các phòng chat theo vị trí.
         try {
             com.bluetalk.android.nostr.GeohashAliasRegistry.initialize(this)
             com.bluetalk.android.nostr.GeohashConversationRegistry.initialize(this)
         } catch (_: Exception) { }
 
-        // Initialize mesh service preferences
+        // Khởi tạo tùy chỉnh cho dịch vụ Mesh Bluetooth.
         try { com.bluetalk.android.service.MeshServicePreferences.init(this) } catch (_: Exception) { }
 
-        // Proactively start the foreground service to keep mesh alive
+        // Khởi động dịch vụ chạy ngầm (Foreground Service) để duy trì mạng Mesh kể cả khi người dùng đóng app.
         try { com.bluetalk.android.service.MeshForegroundService.start(this) } catch (_: Exception) { }
 
-        // TorManager already initialized above
+        // TorManager đã được khởi tạo ở trên.
     }
 }
+

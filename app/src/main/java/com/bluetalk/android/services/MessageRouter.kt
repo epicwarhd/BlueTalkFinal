@@ -7,7 +7,9 @@ import com.bluetalk.android.model.ReadReceipt
 import com.bluetalk.android.nostr.NostrTransport
 
 /**
- * Routes messages between BLE mesh and Nostr transports, matching iOS behavior.
+ * MessageRouter: "Bộ điều hướng" tin nhắn.
+ * Lớp này chịu trách nhiệm chọn con đường tối ưu để gửi tin nhắn: 
+ * qua Bluetooth Mesh (ngoại tuyến) hoặc qua Nostr Transport (trực tuyến).
  */
 class MessageRouter private constructor(
     private val context: Context,
@@ -23,7 +25,7 @@ class MessageRouter private constructor(
                 INSTANCE ?: run {
                     val nostr = NostrTransport.getInstance(context)
                     MessageRouter(context.applicationContext, mesh, nostr).also { instance ->
-                        // Register for favorites changes to flush outbox
+                        // Đăng ký lắng nghe thay đổi danh sách yêu thích để gửi tin nhắn đang chờ.
                         try {
                             com.bluetalk.android.favorites.FavoritesPersistenceService.shared.addListener(instance.favoriteListener)
                         } catch (_: Exception) {}
@@ -31,54 +33,58 @@ class MessageRouter private constructor(
                     }
                 }
             }
-            // Always update mesh reference and sync peer ID
+            // Luôn cập nhật tham chiếu mesh và đồng bộ peer ID.
             instance.mesh = mesh
             instance.nostr.senderPeerID = mesh.myPeerID
             return instance
         }
     }
 
-    // Outbox: peerID -> queued (content, nickname, messageID)
+    // Hàng chờ gửi (Outbox): peerID -> danh sách tin nhắn (content, nickname, messageID) đang chờ được gửi.
     private val outbox = mutableMapOf<String, MutableList<Triple<String, String, String>>>()
 
-    // Listener for favorites changes to flush outbox when npub mapping appears/changes
+    // Listener lắng nghe thay đổi danh sách yêu thích để giải phóng hàng chờ gửi.
     private val favoriteListener = object: com.bluetalk.android.favorites.FavoritesChangeListener {
 
         override fun onFavoriteChanged(noiseKeyHex: String) {
             flushOutboxFor(noiseKeyHex)
-            // Also try 16-hex short id commonly used in UI if any client used that
             val shortId = noiseKeyHex.take(16)
             flushOutboxFor(shortId)
         }
-        override fun onAllCleared() {
-            // Nothing special; leave queued items until routing becomes possible
-        }
+        override fun onAllCleared() {}
     }
-
+    /**
+     * Hàm gửi tin nhắn riêng tư (Private Message). Logic điều hướng chính:
+     * 1. Nếu người nhận đang ở gần (Bluetooth) và đã bảo mật (Noise), gửi qua Mesh.
+     * 2. Nếu không ở gần nhưng có định danh Nostr (Internet), gửi qua mạng Nostr thông qua Tor.
+     * 3. Nếu chưa có con đường nào, lưu tin nhắn vào Outbox để chờ gửi sau.
+     */
     fun sendPrivate(content: String, toPeerID: String, recipientNickname: String, messageID: String) {
-        // First: if this is a geohash DM alias (nostr_<pub16>), route via Nostr using global registry
+        // Kiểm tra xem đây có phải là tin nhắn gửi đến một khu vực Geohash nhất định không.
         if (com.bluetalk.android.nostr.GeohashAliasRegistry.contains(toPeerID)) {
             Log.d(TAG, "Routing PM via Nostr (geohash) to alias ${toPeerID.take(12)}… id=${messageID.take(8)}…")
             val recipientHex = com.bluetalk.android.nostr.GeohashAliasRegistry.get(toPeerID)
             if (recipientHex != null) {
-                // Resolve the conversation's source geohash, so we can send from anywhere
                 val sourceGeohash = com.bluetalk.android.nostr.GeohashConversationRegistry.get(toPeerID)
-
-                // If repository knows the source geohash, pass it so NostrTransport derives the correct identity
                 nostr.sendPrivateMessageGeohash(content, recipientHex, messageID, sourceGeohash)
                 return
             }
         }
 
+        // Kiểm tra kết nối Bluetooth hiện tại.
         val hasMesh = mesh.getPeerInfo(toPeerID)?.isConnected == true
         val hasEstablished = mesh.hasEstablishedSession(toPeerID)
+        
         if (hasMesh && hasEstablished) {
+            // Đường đi 1: Bluetooth Mesh (Offline).
             Log.d(TAG, "Routing PM via mesh to ${toPeerID} msg_id=${messageID.take(8)}…")
             mesh.sendPrivateMessage(content, toPeerID, recipientNickname, messageID)
         } else if (canSendViaNostr(toPeerID)) {
+            // Đường đi 2: Nostr (Online) qua Tor.
             Log.d(TAG, "Routing PM via Nostr to ${toPeerID.take(32)}… msg_id=${messageID.take(8)}…")
             nostr.sendPrivateMessage(content, toPeerID, recipientNickname, messageID)
         } else {
+            // Đường đi 3: Tạm thời lưu vào hàng chờ và bắt đầu quá trình trao đổi khóa Bluetooth.
             Log.d(TAG, "Queued PM for ${toPeerID} (no mesh, no Nostr mapping) msg_id=${messageID.take(8)}…")
             val q = outbox.getOrPut(toPeerID) { mutableListOf() }
             q.add(Triple(content, recipientNickname, messageID))
