@@ -186,7 +186,7 @@ class PermissionManager(private val context: Context) {
         categories.add(
             PermissionCategory(
                 type = PermissionType.NEARBY_DEVICES,
-                description = "Required to discover bluetalk users via Bluetooth",
+                description = context.getString(R.string.perm_nearby_devices_desc),
                 permissions = bluetoothPermissions,
                 isGranted = bluetoothPermissions.all { isPermissionGranted(it) },
                 systemDescription = "Allow bluetalk to connect to nearby devices"
@@ -202,7 +202,7 @@ class PermissionManager(private val context: Context) {
         categories.add(
             PermissionCategory(
                 type = PermissionType.PRECISE_LOCATION,
-                description = "Required by Android to discover nearby bluetalk users via Bluetooth",
+                description = context.getString(R.string.perm_location_desc),
                 permissions = locationPermissions,
                 isGranted = locationPermissions.all { isPermissionGranted(it) },
                 systemDescription = "bluetalk needs this to scan for nearby devices"
@@ -227,7 +227,7 @@ class PermissionManager(private val context: Context) {
             categories.add(
                 PermissionCategory(
                     type = PermissionType.NOTIFICATIONS,
-                    description = "Receive notifications when you receive private messages",
+                    description = context.getString(R.string.perm_notifications_desc),
                     permissions = listOf(Manifest.permission.POST_NOTIFICATIONS),
                     isGranted = isPermissionGranted(Manifest.permission.POST_NOTIFICATIONS),
                     systemDescription = "Allow bluetalk to send you notifications"
@@ -242,7 +242,7 @@ class PermissionManager(private val context: Context) {
             categories.add(
                 PermissionCategory(
                     type = PermissionType.BATTERY_OPTIMIZATION,
-                    description = "Disable battery optimization to ensure bluetalk runs reliably in the background and maintains mesh network connections",
+                    description = context.getString(R.string.perm_battery_desc),
                     permissions = listOf("BATTERY_OPTIMIZATION"), // Custom identifier
                     isGranted = isBatteryOptimizationDisabled(),
                     systemDescription = "Allow bluetalk to run without battery restrictions"
@@ -303,11 +303,11 @@ data class PermissionCategory(
 )
 
 enum class PermissionType(val nameValue: String) {
-    NEARBY_DEVICES("Nearby Devices"),
-    PRECISE_LOCATION("Precise Location"),
-    BACKGROUND_LOCATION("Background Location"),
+    NEARBY_DEVICES("Thiết bị gần đó"),
+    PRECISE_LOCATION("Vị trí chính xác"),
+    BACKGROUND_LOCATION("Vị trí chạy ngầm"),
     MICROPHONE("Microphone"),
-    NOTIFICATIONS("Notifications"),
-    BATTERY_OPTIMIZATION("Battery Optimization"),
-    OTHER("Other")
+    NOTIFICATIONS("Thông báo"),
+    BATTERY_OPTIMIZATION("Tối ưu hóa pin"),
+    OTHER("Khác")
 }

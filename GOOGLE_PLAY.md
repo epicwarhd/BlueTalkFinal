@@ -1,1 +1,0 @@
-I, callebtc, creator of bluetalk for android, owner of the copyright claims, and owner of the official bluetalk android repository (https://github.com/permissionlesstech/bluetalk-android), hereby authorize Verse Communication PBC to publish bluetalk (com.bluetalk.doid) on the Google Play Store.
